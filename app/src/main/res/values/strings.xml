@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">课程表</string>
+    <string name="title_timetable">课表</string>
+    <string name="title_courses">课程</string>
+    <string name="title_settings">设置</string>
+    <string name="add_course">添加课程</string>
+    <string name="course_info">课程信息</string>
+    <string name="empty_course_list">暂无课程，点击右下角添加</string>
+    <string name="empty_timetable">本周暂无课程</string>
+</resources>

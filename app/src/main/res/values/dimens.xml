@@ -1,0 +1,15 @@
+<resources>
+    <!-- 默认屏幕边距 -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- 课表网格尺寸（默认/小屏 ≤420dp） -->
+    <dimen name="timetable_cell_name_text_size">11sp</dimen>
+    <dimen name="timetable_cell_room_text_size">10sp</dimen>
+    <dimen name="timetable_period_text_size">11sp</dimen>
+    <dimen name="timetable_header_text_size">13sp</dimen>
+    <dimen name="timetable_cell_min_width">40dp</dimen>
+    <dimen name="timetable_cell_max_width">80dp</dimen>
+    <dimen name="timetable_period_label_width">48dp</dimen>
+    <dimen name="timetable_cell_height">58dp</dimen>
+</resources>

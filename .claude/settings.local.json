@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//d/App/Android/**)",
+      "Bash(where java *)",
+      "Bash(ls \"D:/App/Android/SDK/\" 2>/dev/null | head -20 && ls \"D:/App/\" | head -20)",
+      "Read(//d/App/**)",
+      "Bash(where javac *)",
+      "Read(//c/Program Files/**)",
+      "Bash(./gradlew assembleDebug)"
+    ]
+  }
+}

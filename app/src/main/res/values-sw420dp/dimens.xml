@@ -1,0 +1,10 @@
+<resources>
+    <!-- 大屏课表尺寸（sw420dp+） -->
+    <dimen name="timetable_cell_name_text_size">13sp</dimen>
+    <dimen name="timetable_cell_room_text_size">12sp</dimen>
+    <dimen name="timetable_period_text_size">13sp</dimen>
+    <dimen name="timetable_header_text_size">14sp</dimen>
+    <dimen name="timetable_cell_min_width">48dp</dimen>
+    <dimen name="timetable_cell_max_width">96dp</dimen>
+    <dimen name="timetable_period_label_width">52dp</dimen>
+</resources>

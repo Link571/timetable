@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <!-- Period label -->
+    <TextView
+        android:id="@+id/tv_period_label"
+        android:layout_width="@dimen/timetable_period_label_width"
+        android:layout_height="@dimen/timetable_cell_height"
+        android:gravity="center"
+        android:textSize="@dimen/timetable_period_text_size"
+        android:textColor="?android:attr/textColorSecondary"
+        android:background="?android:attr/colorBackground"
+        android:padding="2dp" />
+
+    <!-- Monday cell -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_mon"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/timetable_cell_height"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="1dp"
+        app:strokeWidth="0dp"
+        android:layout_margin="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="2dp">
+
+            <TextView
+                android:id="@+id/tv_mon_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/timetable_cell_name_text_size"
+                android:textColor="@android:color/white"
+                android:gravity="center"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_mon_room"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/timetable_cell_room_text_size"
+                android:textColor="#CCFFFFFF"
+                android:gravity="center"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Tuesday -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_tue"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/timetable_cell_height"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="1dp"
+        app:strokeWidth="0dp"
+        android:layout_margin="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="2dp">
+
+            <TextView
+                android:id="@+id/tv_tue_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/timetable_cell_name_text_size"
+                android:textColor="@android:color/white"
+                android:gravity="center"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_tue_room"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/timetable_cell_room_text_size"
+                android:textColor="#CCFFFFFF"
+                android:gravity="center"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Wednesday -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_wed"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/timetable_cell_height"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="1dp"
+        app:strokeWidth="0dp"
+        android:layout_margin="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="2dp">
+
+            <TextView
+                android:id="@+id/tv_wed_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/timetable_cell_name_text_size"
+                android:textColor="@android:color/white"
+                android:gravity="center"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_wed_room"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/timetable_cell_room_text_size"
+                android:textColor="#CCFFFFFF"
+                android:gravity="center"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Thursday -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_thu"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/timetable_cell_height"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="1dp"
+        app:strokeWidth="0dp"
+        android:layout_margin="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="2dp">
+
+            <TextView
+                android:id="@+id/tv_thu_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/timetable_cell_name_text_size"
+                android:textColor="@android:color/white"
+                android:gravity="center"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_thu_room"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/timetable_cell_room_text_size"
+                android:textColor="#CCFFFFFF"
+                android:gravity="center"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Friday -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_fri"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/timetable_cell_height"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="1dp"
+        app:strokeWidth="0dp"
+        android:layout_margin="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="2dp">
+
+            <TextView
+                android:id="@+id/tv_fri_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/timetable_cell_name_text_size"
+                android:textColor="@android:color/white"
+                android:gravity="center"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_fri_room"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/timetable_cell_room_text_size"
+                android:textColor="#CCFFFFFF"
+                android:gravity="center"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Saturday -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_sat"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/timetable_cell_height"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="1dp"
+        app:strokeWidth="0dp"
+        android:layout_margin="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="2dp">
+
+            <TextView
+                android:id="@+id/tv_sat_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/timetable_cell_name_text_size"
+                android:textColor="@android:color/white"
+                android:gravity="center"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_sat_room"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/timetable_cell_room_text_size"
+                android:textColor="#CCFFFFFF"
+                android:gravity="center"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Sunday -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_sun"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/timetable_cell_height"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="1dp"
+        app:strokeWidth="0dp"
+        android:layout_margin="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="2dp">
+
+            <TextView
+                android:id="@+id/tv_sun_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/timetable_cell_name_text_size"
+                android:textColor="@android:color/white"
+                android:gravity="center"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_sun_room"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/timetable_cell_room_text_size"
+                android:textColor="#CCFFFFFF"
+                android:gravity="center"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>
