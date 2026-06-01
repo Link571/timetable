@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.timetable.data.model.Semester;
 import com.example.timetable.databinding.FragmentSettingsBinding;
+import com.example.timetable.R;
 import com.example.timetable.util.ColorUtils;
 import com.example.timetable.util.PreferenceUtils;
 
@@ -49,6 +50,7 @@ public class SettingsFragment extends Fragment {
 
         setupReminderSettings();
         setupThemeColorPicker();
+        setupWeekModeToggle();
 
         binding.btnEditPeriodTimes.setOnClickListener(v -> showEditPeriodTimesDialog());
 
@@ -68,7 +70,7 @@ public class SettingsFragment extends Fragment {
 
         viewModel.getActiveSemester().observe(getViewLifecycleOwner(), semester -> {
             if (semester != null) {
-                setupWeekPicker(semester);
+                setupWeekStepper(semester);
             }
         });
 
@@ -88,14 +90,21 @@ public class SettingsFragment extends Fragment {
         });
 
         binding.btnAddSemester.setOnClickListener(v -> showAddSemesterDialog());
+        binding.btnDeleteSemester.setOnClickListener(v -> showDeleteSemesterDialog());
     }
 
-    private void setupWeekPicker(Semester semester) {
-        binding.npWeek.setMinValue(1);
-        binding.npWeek.setMaxValue(semester.getTotalWeeks());
-        binding.npWeek.setValue(semester.getCurrentWeek());
-        binding.npWeek.setOnValueChangedListener((picker, oldVal, newVal) -> {
-            viewModel.setCurrentWeek(semester.getId(), newVal);
+    private void setupWeekStepper(Semester semester) {
+        binding.tvWeekDisplay.setText(String.format("第%d周", semester.getCurrentWeek()));
+
+        binding.btnWeekMinus.setOnClickListener(v -> {
+            if (semester.getCurrentWeek() > 1) {
+                viewModel.setCurrentWeek(semester.getId(), semester.getCurrentWeek() - 1);
+            }
+        });
+        binding.btnWeekPlus.setOnClickListener(v -> {
+            if (semester.getCurrentWeek() < semester.getTotalWeeks()) {
+                viewModel.setCurrentWeek(semester.getId(), semester.getCurrentWeek() + 1);
+            }
         });
 
         long today = System.currentTimeMillis();
@@ -111,11 +120,26 @@ public class SettingsFragment extends Fragment {
         binding.switchReminder.setOnCheckedChangeListener((buttonView, isChecked) ->
             PreferenceUtils.setReminderEnabled(requireContext(), isChecked));
 
-        binding.npAdvanceMinutes.setMinValue(5);
-        binding.npAdvanceMinutes.setMaxValue(60);
-        binding.npAdvanceMinutes.setValue(PreferenceUtils.getReminderMinutes(requireContext()));
-        binding.npAdvanceMinutes.setOnValueChangedListener((picker, oldVal, newVal) ->
-            PreferenceUtils.setReminderMinutes(requireContext(), newVal));
+        updateMinutesDisplay();
+        binding.btnMinutesMinus.setOnClickListener(v -> {
+            int current = PreferenceUtils.getReminderMinutes(requireContext());
+            if (current > 5) {
+                PreferenceUtils.setReminderMinutes(requireContext(), current - 5);
+                updateMinutesDisplay();
+            }
+        });
+        binding.btnMinutesPlus.setOnClickListener(v -> {
+            int current = PreferenceUtils.getReminderMinutes(requireContext());
+            if (current < 60) {
+                PreferenceUtils.setReminderMinutes(requireContext(), current + 5);
+                updateMinutesDisplay();
+            }
+        });
+    }
+
+    private void updateMinutesDisplay() {
+        int minutes = PreferenceUtils.getReminderMinutes(requireContext());
+        binding.tvMinutesDisplay.setText(String.format("%d 分钟", minutes));
     }
 
     private void setupThemeColorPicker() {
@@ -147,6 +171,35 @@ public class SettingsFragment extends Fragment {
             });
             binding.themeColorPicker.addView(dot);
         }
+    }
+
+    private void setupWeekModeToggle() {
+        boolean isWeekend = PreferenceUtils.getWeekMode(requireContext()) == PreferenceUtils.WEEK_MODE_WEEKEND;
+        binding.switchWeekendMode.setChecked(isWeekend);
+        binding.switchWeekendMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            int mode = isChecked ? PreferenceUtils.WEEK_MODE_WEEKEND : PreferenceUtils.WEEK_MODE_NORMAL;
+            PreferenceUtils.setWeekMode(requireContext(), mode);
+            Toast.makeText(requireContext(), "显示模式已保存，请切换到课表页面查看", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void showDeleteSemesterDialog() {
+        if (allSemesters == null || allSemesters.isEmpty()) {
+            Toast.makeText(requireContext(), "没有可删除的学期", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        int pos = binding.spinnerSemester.getSelectedItemPosition();
+        if (pos < 0 || pos >= allSemesters.size()) return;
+        Semester selected = allSemesters.get(pos);
+        new AlertDialog.Builder(requireContext())
+            .setTitle("删除学期")
+            .setMessage(getString(R.string.confirm_delete_semester))
+            .setPositiveButton("确定删除", (dialog, which) -> {
+                viewModel.deleteSemester(selected.getId());
+                Toast.makeText(requireContext(), "已删除 " + selected.getName(), Toast.LENGTH_SHORT).show();
+            })
+            .setNegativeButton("取消", null)
+            .show();
     }
 
     private void showEditPeriodTimesDialog() {

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +18,7 @@ import com.example.timetable.data.model.Course;
 import com.example.timetable.databinding.FragmentTimetableBinding;
 import com.example.timetable.R;
 import com.example.timetable.ui.course.CourseEditDialogFragment;
+import com.example.timetable.ui.course.CourseSlotDialogFragment;
 import com.example.timetable.util.PreferenceUtils;
 
 public class TimetableFragment extends Fragment {
@@ -38,21 +40,17 @@ public class TimetableFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(TimetableViewModel.class);
 
-        // Apply theme color
-        int themeColor = PreferenceUtils.getThemeColor(requireContext());
-        binding.weekIndicator.setBackgroundColor(themeColor);
-        binding.headerRow.setBackgroundColor(themeColor);
-
+        // 点击课表单元格 → 打开时段课程列表（二级页面）
         adapter = new TimetableAdapter((dayOfWeek, period, existingCourse) -> {
-            CourseEditDialogFragment dialog = CourseEditDialogFragment.newInstance(existingCourse, dayOfWeek, period);
-            dialog.show(getParentFragmentManager(), "CourseEditDialog");
+            CourseSlotDialogFragment dialog = CourseSlotDialogFragment.newInstance(dayOfWeek, period);
+            dialog.show(getParentFragmentManager(), "CourseSlotDialog");
         });
 
         binding.rvTimetable.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvTimetable.setAdapter(adapter);
         binding.rvTimetable.setNestedScrollingEnabled(false);
 
-        // 根据屏幕宽度动态计算课表单元格尺寸
+        // 根据屏幕宽度和显示模式动态计算课表单元格尺寸
         applyDynamicCellSizing();
 
         viewModel.getGridData().observe(getViewLifecycleOwner(), rows -> {
@@ -70,36 +68,56 @@ public class TimetableFragment extends Fragment {
             binding.tvEmpty.setVisibility(empty ? View.VISIBLE : View.GONE);
         });
 
-        viewModel.getWeekInfo().observe(getViewLifecycleOwner(), info -> {
-            binding.tvWeekInfo.setText(info);
+        // 当前周次文字
+        viewModel.getWeekInfo().observe(getViewLifecycleOwner(), weekText -> {
+            if (weekText != null && !weekText.isEmpty()) {
+                binding.tvWeekInfo.setText(weekText);
+                binding.tvWeekInfo.setVisibility(View.VISIBLE);
+            } else {
+                binding.tvWeekInfo.setVisibility(View.GONE);
+            }
         });
 
-        binding.btnPrevWeek.setOnClickListener(v -> viewModel.prevWeek());
-        binding.btnNextWeek.setOnClickListener(v -> viewModel.nextWeek());
+        // 表头日期
+        viewModel.getHeaderDates().observe(getViewLifecycleOwner(), dates -> {
+            if (dates != null) {
+                updateHeaderDates(dates);
+            }
+        });
+
+        // FAB 添加课程（不预设星期和节次）
+        binding.fabAddCourse.setOnClickListener(v -> {
+            CourseEditDialogFragment dialog = CourseEditDialogFragment.newInstance(null, 0, 0);
+            dialog.show(getParentFragmentManager(), "CourseEditDialog");
+        });
     }
 
     /**
-     * 根据屏幕宽度动态计算课表单元格宽度，使7天列尽量完整显示
-     * 公式：cellWidth = (screenWidth - periodLabel - margins) / 7
-     * 结果钳位在 minWidth ~ maxWidth 之间，防止过小或过大
+     * 根据屏幕宽度和显示模式动态计算课表单元格宽度
+     * 公式：cellWidth = (screenWidth - periodLabel - margins) / dayCount
+     * 正常模式（周一至周五）：dayCount = 5
+     * 周末模式（周一至周日）：dayCount = 7
      */
     private void applyDynamicCellSizing() {
-        // 获取屏幕宽度（px）
         int screenWidthPx = getResources().getDisplayMetrics().widthPixels;
-        float density = getResources().getDisplayMetrics().density;
 
-        // 从 dimens 资源读取限制值（dp → px）
         int minWidthPx = (int) (getResources().getDimension(R.dimen.timetable_cell_min_width));
         int maxWidthPx = (int) (getResources().getDimension(R.dimen.timetable_cell_max_width));
         int labelWidthPx = (int) (getResources().getDimension(R.dimen.timetable_period_label_width));
 
-        // 每个单元格 margin 为 1dp（左右共 2dp），7 个单元格共 7 个 margin
-        int marginPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics());
-        // 总间距 = 7 个单元格 × 每格左右各 1dp margin = 14dp，加上可能的父容器边距
-        int totalMarginsPx = marginPx * 14;
+        // 读取显示模式
+        int weekMode = PreferenceUtils.getWeekMode(requireContext());
+        int dayCount = (weekMode == PreferenceUtils.WEEK_MODE_WEEKEND) ? 7 : 5;
 
-        // 计算单元格宽度（px）
-        int cellWidthPx = (screenWidthPx - labelWidthPx - totalMarginsPx) / 7;
+        // 设置 Adapter 显示模式（控制周六/周日列可见性）
+        adapter.setWeekMode(weekMode);
+
+        // 每个单元格 margin = 1dp，总间距 = dayCount × 2dp
+        int marginPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics());
+        int totalMarginsPx = marginPx * dayCount * 2;
+
+        // 计算单元格宽度
+        int cellWidthPx = (screenWidthPx - labelWidthPx - totalMarginsPx) / dayCount;
 
         // 钳位到合理范围
         if (cellWidthPx < minWidthPx) {
@@ -108,16 +126,36 @@ public class TimetableFragment extends Fragment {
             cellWidthPx = maxWidthPx;
         }
 
-        // 设置 Adapter 单元格宽度
         adapter.setCellWidth(cellWidthPx);
 
-        // 同步调整表头行（周一~周日，跳过第一个空占位 TextView）
+        // 同步调整表头行（跳过第一个空占位 TextView）
         LinearLayout headerRow = binding.headerRow;
         for (int i = 1; i < headerRow.getChildCount(); i++) {
             View headerCell = headerRow.getChildAt(i);
             ViewGroup.LayoutParams lp = headerCell.getLayoutParams();
             lp.width = cellWidthPx;
             headerCell.setLayoutParams(lp);
+            // 周六（i=6）、周日（i=7）：正常模式隐藏，周末模式显示
+            if (i == 6 || i == 7) {
+                headerCell.setVisibility(weekMode == PreferenceUtils.WEEK_MODE_WEEKEND ? View.VISIBLE : View.GONE);
+            }
+        }
+    }
+
+    /**
+     * 更新表头周一~周日下方的日期小字
+     * @param dates 索引 1-7 为周一~周日的日期字符串，如 "6/2"
+     */
+    private void updateHeaderDates(String[] dates) {
+        LinearLayout headerRow = binding.headerRow;
+        for (int d = 1; d <= 7 && d < headerRow.getChildCount(); d++) {
+            View dayLayout = headerRow.getChildAt(d);
+            if (dayLayout instanceof LinearLayout) {
+                LinearLayout ll = (LinearLayout) dayLayout;
+                if (ll.getChildCount() >= 2 && ll.getChildAt(1) instanceof TextView) {
+                    ((TextView) ll.getChildAt(1)).setText(dates[d] != null ? dates[d] : "");
+                }
+            }
         }
     }
 

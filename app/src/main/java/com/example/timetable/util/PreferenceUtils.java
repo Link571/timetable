@@ -13,6 +13,10 @@ public class PreferenceUtils {
     private static final String KEY_REMINDER_MINUTES = "reminder_minutes";
     private static final String KEY_THEME_COLOR = "theme_color";
     private static final String KEY_PERIOD_TIMES = "period_times";
+    private static final String KEY_WEEK_MODE = "week_mode";
+
+    public static final int WEEK_MODE_NORMAL = 0;  // 周一至周五
+    public static final int WEEK_MODE_WEEKEND = 1; // 周一至周日
 
     public static final String[] DEFAULT_PERIOD_TIMES = {
         "08:00-08:45", "08:55-09:40", "09:50-10:35", "10:45-11:30",
@@ -63,6 +67,14 @@ public class PreferenceUtils {
         JSONArray arr = new JSONArray();
         for (String t : times) arr.put(t);
         getPrefs(context).edit().putString(KEY_PERIOD_TIMES, arr.toString()).apply();
+    }
+
+    public static int getWeekMode(Context context) {
+        return getPrefs(context).getInt(KEY_WEEK_MODE, WEEK_MODE_NORMAL);
+    }
+
+    public static void setWeekMode(Context context, int mode) {
+        getPrefs(context).edit().putInt(KEY_WEEK_MODE, mode).apply();
     }
 
     // Parse start time from period time string like "08:00-08:45"

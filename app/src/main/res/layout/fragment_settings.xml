@@ -38,13 +38,30 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp" />
 
-                <Button
-                    android:id="@+id/btn_add_semester"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="添加新学期"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_marginTop="4dp" />
+                    android:orientation="horizontal"
+                    android:layout_marginTop="4dp">
+
+                    <Button
+                        android:id="@+id/btn_add_semester"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="添加新学期"
+                        style="@style/Widget.MaterialComponents.Button.TextButton" />
+
+                    <Button
+                        android:id="@+id/btn_delete_semester"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/delete_semester"
+                        android:textColor="@android:color/holo_red_dark"
+                        style="@style/Widget.MaterialComponents.Button.TextButton" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -93,11 +110,37 @@
                         android:text="手动设置："
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
 
-                    <NumberPicker
-                        android:id="@+id/np_week"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_week_minus"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="−"
+                        android:textSize="20sp"
+                        android:textAllCaps="false"
+                        app:cornerRadius="20dp"
+                        app:strokeWidth="1dp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                    <TextView
+                        android:id="@+id/tv_week_display"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1" />
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="第1周"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_week_plus"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="+"
+                        android:textSize="20sp"
+                        android:textAllCaps="false"
+                        app:cornerRadius="20dp"
+                        app:strokeWidth="1dp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
                 </LinearLayout>
 
@@ -160,19 +203,93 @@
                         android:text="提前提醒："
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
 
-                    <NumberPicker
-                        android:id="@+id/np_advance_minutes"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_minutes_minus"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="−"
+                        android:textSize="20sp"
+                        android:textAllCaps="false"
+                        app:cornerRadius="20dp"
+                        app:strokeWidth="1dp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tv_minutes_display"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="分钟"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="15 分钟"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_minutes_plus"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="+"
+                        android:textSize="20sp"
+                        android:textAllCaps="false"
+                        app:cornerRadius="20dp"
+                        app:strokeWidth="1dp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
                 </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Week Mode Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/week_mode_title"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardElevation="2dp"
+            app:cardCornerRadius="8dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/week_mode_weekend"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_weekend_mode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/week_mode_hint"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:layout_marginTop="4dp" />
 
             </LinearLayout>
 

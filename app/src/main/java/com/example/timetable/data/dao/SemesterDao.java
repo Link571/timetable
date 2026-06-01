@@ -42,4 +42,7 @@ public interface SemesterDao {
 
     @Query("SELECT * FROM semester WHERE id = :semesterId")
     Semester getByIdSync(int semesterId);
+
+    @Query("DELETE FROM semester WHERE id = :semesterId")
+    void deleteById(int semesterId);
 }

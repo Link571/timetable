@@ -7,4 +7,13 @@
     <string name="course_info">课程信息</string>
     <string name="empty_course_list">暂无课程，点击右下角添加</string>
     <string name="empty_timetable">本周暂无课程</string>
+    <string name="delete_semester">删除当前学期</string>
+    <string name="week_mode_title">课表显示模式</string>
+    <string name="week_mode_weekend">周末显示课程（周一至周日）</string>
+    <string name="week_mode_hint">关闭后课表仅显示周一至周五</string>
+    <string name="confirm_delete_semester">确认删除该学期及其所有课程？\n此操作不可撤销。</string>
+    <string name="week_display">第%d周</string>
+    <string name="minutes_display">%d 分钟</string>
+    <string name="course_conflict_title">课程时间冲突</string>
+    <string name="course_conflict_message">"%1$s" 与以下课程时间冲突：\n\n%2$s\n%3$s 第%4$d-%5$d节\n\n是否仍然保存？</string>
 </resources>

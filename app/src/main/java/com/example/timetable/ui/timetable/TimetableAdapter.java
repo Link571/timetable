@@ -22,6 +22,7 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.RowV
     private List<Course[]> gridData = new ArrayList<>();
     private OnCellClickListener listener;
     private int cellWidthPx = -1; // -1 表示未设置，使用 XML 默认宽度
+    private int weekMode = 0; // 0 = 周一至周五, 1 = 周一至周日
 
     public interface OnCellClickListener {
         void onCellClick(int dayOfWeek, int period, Course existingCourse);
@@ -42,6 +43,15 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.RowV
      */
     public void setCellWidth(int cellWidthPx) {
         this.cellWidthPx = cellWidthPx;
+        notifyDataSetChanged();
+    }
+
+    /**
+     * 设置课表显示模式
+     * @param weekMode 0 = 周一至周五, 1 = 周一至周日
+     */
+    public void setWeekMode(int weekMode) {
+        this.weekMode = weekMode;
         notifyDataSetChanged();
     }
 
@@ -101,6 +111,11 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.RowV
                     ViewGroup.LayoutParams lp = card.getLayoutParams();
                     lp.width = cellWidthPx;
                     card.setLayoutParams(lp);
+                }
+
+                // 根据显示模式控制周六/周日列可见性
+                if (day == 6 || day == 7) {
+                    card.setVisibility(weekMode == 1 ? View.VISIBLE : View.GONE);
                 }
 
                 if (course != null) {

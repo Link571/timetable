@@ -14,6 +14,7 @@ import com.example.timetable.repository.TimetableRepository;
 import com.example.timetable.util.WeekPatternUtils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class TimetableViewModel extends AndroidViewModel {
@@ -22,6 +23,7 @@ public class TimetableViewModel extends AndroidViewModel {
     private final MutableLiveData<List<Course[]>> gridData = new MutableLiveData<>();
     private final MutableLiveData<Integer> currentWeek = new MutableLiveData<>(1);
     private final MutableLiveData<String> weekInfo = new MutableLiveData<>("");
+    private final MutableLiveData<String[]> headerDates = new MutableLiveData<>();
 
     private Semester activeSemester;
     private List<Course> allCourses = new ArrayList<>();
@@ -71,6 +73,7 @@ public class TimetableViewModel extends AndroidViewModel {
     public LiveData<List<Course[]>> getGridData() { return gridData; }
     public LiveData<Integer> getCurrentWeek() { return currentWeek; }
     public LiveData<String> getWeekInfo() { return weekInfo; }
+    public LiveData<String[]> getHeaderDates() { return headerDates; }
 
     public void nextWeek() {
         if (activeSemester == null) return;
@@ -98,6 +101,17 @@ public class TimetableViewModel extends AndroidViewModel {
 
         if (activeSemester != null) {
             weekInfo.postValue("第" + week + "周 (共" + activeSemester.getTotalWeeks() + "周)");
+            // 计算周一~周日对应的实际日期
+            String[] dates = new String[8]; // 索引 1-7 对应周一~周日
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(activeSemester.getStartDate());
+            cal.add(Calendar.WEEK_OF_YEAR, week - 1);
+            for (int d = 1; d <= 7; d++) {
+                Calendar dayCal = (Calendar) cal.clone();
+                dayCal.add(Calendar.DAY_OF_MONTH, d - 1);
+                dates[d] = (dayCal.get(Calendar.MONTH) + 1) + "/" + dayCal.get(Calendar.DAY_OF_MONTH);
+            }
+            headerDates.postValue(dates);
         } else {
             weekInfo.postValue("第" + week + "周");
         }
@@ -109,11 +123,14 @@ public class TimetableViewModel extends AndroidViewModel {
 
         for (Course course : allCourses) {
             if (WeekPatternUtils.isActiveInWeek(course.getWeekPattern(), week)) {
-                int periodIdx = course.getStartPeriod() - 1;
-                if (periodIdx >= 0 && periodIdx < 12) {
-                    int day = course.getDayOfWeek();
-                    if (day >= 1 && day <= 7) {
-                        rows.get(periodIdx)[day] = course;
+                int day = course.getDayOfWeek();
+                if (day >= 1 && day <= 7) {
+                    int startIdx = course.getStartPeriod() - 1;
+                    int endIdx = startIdx + course.getDuration(); // 结束节次（不含）
+                    for (int idx = startIdx; idx < endIdx && idx < 12; idx++) {
+                        if (idx >= 0) {
+                            rows.get(idx)[day] = course;
+                        }
                     }
                 }
             }

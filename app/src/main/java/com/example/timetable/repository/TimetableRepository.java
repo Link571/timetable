@@ -55,6 +55,13 @@ public class TimetableRepository {
         executor.execute(() -> semesterDao.setCurrentWeek(semesterId, week));
     }
 
+    public void deleteSemester(int semesterId) {
+        executor.execute(() -> {
+            courseDao.deleteAllBySemester(semesterId);
+            semesterDao.deleteById(semesterId);
+        });
+    }
+
     // --- Course operations ---
 
     public LiveData<List<Course>> getCoursesBySemester(int semesterId) {

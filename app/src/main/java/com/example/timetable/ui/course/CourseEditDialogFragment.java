@@ -1,5 +1,6 @@
 package com.example.timetable.ui.course;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.timetable.R;
 import com.example.timetable.data.database.AppDatabase;
 import com.example.timetable.data.model.Course;
 import com.example.timetable.data.model.Semester;
@@ -24,6 +26,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.chip.Chip;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -123,6 +126,7 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
                     binding.btnDelete.setVisibility(View.VISIBLE);
                 } else {
                     binding.btnDelete.setVisibility(View.GONE);
+                    binding.chipAll.setChecked(true); // 新建课程默认选中"全部周"
                     if (presetDay > 0) binding.spinnerDay.setSelection(presetDay - 1);
                     if (presetPeriod > 0) {
                         binding.npStartPeriod.setValue(presetPeriod);
@@ -248,6 +252,7 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
             return;
         }
 
+        // 在后台线程构建课程数据并检测冲突
         executor.execute(() -> {
             Semester semester = repository.getActiveSemesterSync();
             if (semester == null) {
@@ -274,6 +279,7 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
                 finalWeeks = WeekPatternUtils.generatePattern(semester.getTotalWeeks(), selectedPatternType, null);
             }
 
+            // 构建待保存的课程对象（先不入库）
             Course course = existingCourse != null ? existingCourse : new Course();
             course.setName(name);
             course.setTeacher(binding.etTeacher.getText().toString().trim());
@@ -286,14 +292,75 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
             course.setSemesterId(semester.getId());
             course.setNotes(binding.etNotes.getText().toString().trim());
 
-            if (existingCourse != null) {
-                repository.updateCourse(course);
-            } else {
-                repository.insertCourse(course);
-            }
+            // 检测时间冲突
+            List<Course> allCourses = repository.getCoursesBySemesterSync(semester.getId());
+            List<Course> conflicts = findConflicts(course, allCourses);
 
-            requireActivity().runOnUiThread(this::dismiss);
+            if (!conflicts.isEmpty()) {
+                String[] dayNames = {"", "周一", "周二", "周三", "周四", "周五", "周六", "周日"};
+                Course conflict = conflicts.get(0);
+                int confEnd = conflict.getStartPeriod() + conflict.getDuration() - 1;
+                String msg = getString(R.string.course_conflict_message,
+                    course.getName(),
+                    conflict.getName(),
+                    dayNames[conflict.getDayOfWeek()],
+                    conflict.getStartPeriod(),
+                    confEnd);
+
+                requireActivity().runOnUiThread(() ->
+                    new AlertDialog.Builder(requireContext())
+                        .setTitle(R.string.course_conflict_title)
+                        .setMessage(msg)
+                        .setPositiveButton("仍然保存", (d, w) -> executor.execute(() -> {
+                            doSaveCourse(course);
+                            requireActivity().runOnUiThread(this::dismiss);
+                        }))
+                        .setNegativeButton("取消", null)
+                        .show());
+            } else {
+                doSaveCourse(course);
+                requireActivity().runOnUiThread(this::dismiss);
+            }
         });
+    }
+
+    /**
+     * 检测新课程与已有课程列表的时间冲突
+     * 冲突条件：同一天 + 节次范围重叠 + 周次有交集
+     */
+    private List<Course> findConflicts(Course newCourse, List<Course> allCourses) {
+        List<Course> result = new ArrayList<>();
+        int newDay = newCourse.getDayOfWeek();
+        int newStart = newCourse.getStartPeriod();
+        int newEnd = newStart + newCourse.getDuration(); // 不含结束节次
+        List<Integer> newWeeks = newCourse.getWeekPattern();
+
+        for (Course existing : allCourses) {
+            // 编辑模式：跳过自身
+            if (existingCourse != null && existing.getId() == existingCourse.getId()) continue;
+            // 必须同一天
+            if (existing.getDayOfWeek() != newDay) continue;
+            // 节次范围是否重叠
+            int exStart = existing.getStartPeriod();
+            int exEnd = exStart + existing.getDuration();
+            if (newStart >= exEnd || newEnd <= exStart) continue;
+            // 周次是否有交集
+            if (Collections.disjoint(newWeeks, existing.getWeekPattern())) continue;
+
+            result.add(existing);
+        }
+        return result;
+    }
+
+    /**
+     * 执行实际的入库操作（在后台线程调用）
+     */
+    private void doSaveCourse(Course course) {
+        if (existingCourse != null) {
+            repository.updateCourse(course);
+        } else {
+            repository.insertCourse(course);
+        }
     }
 
     private void deleteCourse() {
