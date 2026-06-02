@@ -2,8 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,6 +12,7 @@
 
         <!-- 当前周次指示（含左右切换箭头） -->
         <LinearLayout
+            android:id="@+id/week_nav_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -44,7 +44,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:textColor="@android:color/white"
-                android:textSize="15sp"
+                android:textSize="@dimen/timetable_nav_text_size"
                 android:textStyle="bold" />
 
             <com.google.android.material.button.MaterialButton
@@ -81,7 +81,7 @@
                 <LinearLayout
                     android:id="@+id/header_row"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="@dimen/timetable_header_height"
                     android:orientation="horizontal"
                     android:background="?attr/colorPrimary"
                     android:elevation="2dp">
@@ -92,7 +92,7 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:textColor="#99FFFFFF"
-                        android:textSize="11sp"
+                        android:textSize="@dimen/timetable_period_text_size"
                         android:text="节次" />
 
                     <!-- 周一 -->
@@ -120,7 +120,7 @@
                             android:gravity="center"
                             android:text=""
                             android:textColor="#CCFFFFFF"
-                            android:textSize="9sp" />
+                            android:textSize="@dimen/timetable_header_date_text_size" />
                     </LinearLayout>
 
                     <!-- 周二 -->
@@ -148,7 +148,7 @@
                             android:gravity="center"
                             android:text=""
                             android:textColor="#CCFFFFFF"
-                            android:textSize="9sp" />
+                            android:textSize="@dimen/timetable_header_date_text_size" />
                     </LinearLayout>
 
                     <!-- 周三 -->
@@ -176,7 +176,7 @@
                             android:gravity="center"
                             android:text=""
                             android:textColor="#CCFFFFFF"
-                            android:textSize="9sp" />
+                            android:textSize="@dimen/timetable_header_date_text_size" />
                     </LinearLayout>
 
                     <!-- 周四 -->
@@ -204,7 +204,7 @@
                             android:gravity="center"
                             android:text=""
                             android:textColor="#CCFFFFFF"
-                            android:textSize="9sp" />
+                            android:textSize="@dimen/timetable_header_date_text_size" />
                     </LinearLayout>
 
                     <!-- 周五 -->
@@ -232,7 +232,7 @@
                             android:gravity="center"
                             android:text=""
                             android:textColor="#CCFFFFFF"
-                            android:textSize="9sp" />
+                            android:textSize="@dimen/timetable_header_date_text_size" />
                     </LinearLayout>
 
                     <!-- 周六 -->
@@ -260,7 +260,7 @@
                             android:gravity="center"
                             android:text=""
                             android:textColor="#CCFFFFFF"
-                            android:textSize="9sp" />
+                            android:textSize="@dimen/timetable_header_date_text_size" />
                     </LinearLayout>
 
                     <!-- 周日 -->
@@ -288,7 +288,7 @@
                             android:gravity="center"
                             android:text=""
                             android:textColor="#CCFFFFFF"
-                            android:textSize="9sp" />
+                            android:textSize="@dimen/timetable_header_date_text_size" />
                     </LinearLayout>
 
                 </LinearLayout>

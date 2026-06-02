@@ -5,11 +5,15 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -32,6 +36,21 @@ public class TimetableFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentTimetableBinding.inflate(inflater, container, false);
+        // 统一应用主题色：状态栏安全区 → 周次导航栏 → 星期标题行，一体化视觉效果
+        applyThemeColor();
+
+        // 适配系统状态栏：给根布局添加顶部内边距，避免内容被状态栏遮挡
+        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
+            int statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            int navBarHeight = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+            v.setPadding(v.getPaddingLeft(), statusBarHeight, v.getPaddingRight(), v.getPaddingBottom());
+            // FAB 底部边距需要考虑系统导航栏高度
+            FrameLayout.LayoutParams fabParams = (FrameLayout.LayoutParams) binding.fabAddCourse.getLayoutParams();
+            int fabBaseMargin = (int) getResources().getDimension(R.dimen.fab_margin);
+            fabParams.bottomMargin = fabBaseMargin + navBarHeight;
+            binding.fabAddCourse.setLayoutParams(fabParams);
+            return insets;
+        });
         return binding.getRoot();
     }
 
@@ -170,6 +189,24 @@ public class TimetableFragment extends Fragment {
                 }
             }
         }
+    }
+
+    /**
+     * 每次页面恢复时重新应用主题色，确保从设置页切回时立即生效
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (binding != null) {
+            applyThemeColor();
+        }
+    }
+
+    private void applyThemeColor() {
+        int themeColor = PreferenceUtils.getThemeColor(requireContext());
+        binding.getRoot().setBackgroundColor(themeColor);
+        binding.weekNavBar.setBackgroundColor(themeColor);
+        binding.headerRow.setBackgroundColor(themeColor);
     }
 
     @Override

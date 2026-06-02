@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
+            android:textColor="@color/black"
             android:singleLine="true"
             android:ellipsize="end" />
 
@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
-            android:textColor="@android:color/darker_gray"
+            android:textColor="#757575"
             android:singleLine="true"
             android:ellipsize="end" />
 

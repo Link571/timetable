@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@android:color/white"
+    android:background="@color/white"
     android:padding="8dp">
 
     <LinearLayout
@@ -19,14 +19,14 @@
             android:text="今日课程"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black" />
+            android:textColor="@color/black" />
 
         <TextView
             android:id="@+id/tv_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="12sp"
-            android:textColor="@android:color/darker_gray" />
+            android:textColor="#757575" />
 
     </LinearLayout>
 
@@ -50,7 +50,7 @@
         android:layout_weight="1"
         android:gravity="center"
         android:text="今天没有课程"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="#757575"
         android:textSize="14sp"
         android:visibility="gone" />
 

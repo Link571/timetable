@@ -10,7 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="80dp">
 
         <!-- ====== 学期管理 ====== -->
         <TextView
@@ -59,7 +62,19 @@
                         android:textAllCaps="false"
                         app:cornerRadius="8dp"
                         style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_marginEnd="4dp" />
+                        android:layout_marginEnd="2dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_edit_semester"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="编辑学期"
+                        android:textAllCaps="false"
+                        app:cornerRadius="8dp"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_marginStart="2dp"
+                        android:layout_marginEnd="2dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_delete_semester"
@@ -71,7 +86,7 @@
                         android:textAllCaps="false"
                         app:cornerRadius="8dp"
                         style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_marginStart="4dp" />
+                        android:layout_marginStart="2dp" />
 
                 </LinearLayout>
 
@@ -407,7 +422,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="选择主题色（重启后生效）"
+                    android:text="选择主题色（即时生效）"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                     android:textColor="?android:attr/textColorSecondary"
                     android:layout_marginBottom="12dp" />

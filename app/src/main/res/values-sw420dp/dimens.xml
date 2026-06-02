@@ -1,10 +1,17 @@
 <resources>
-    <!-- 大屏课表尺寸（sw420dp+） -->
+    <!-- 大屏手机课表尺寸（sw420dp+） -->
     <dimen name="timetable_cell_name_text_size">13sp</dimen>
     <dimen name="timetable_cell_room_text_size">12sp</dimen>
     <dimen name="timetable_period_text_size">13sp</dimen>
     <dimen name="timetable_header_text_size">14sp</dimen>
+    <dimen name="timetable_header_date_text_size">10sp</dimen>
+    <dimen name="timetable_nav_text_size">16sp</dimen>
     <dimen name="timetable_cell_min_width">48dp</dimen>
     <dimen name="timetable_cell_max_width">96dp</dimen>
     <dimen name="timetable_period_label_width">52dp</dimen>
+    <dimen name="timetable_cell_height">62dp</dimen>
+    <dimen name="timetable_header_height">44dp</dimen>
+    <dimen name="dialog_button_height">56dp</dimen>
+    <dimen name="fab_margin">20dp</dimen>
+    <dimen name="settings_content_max_width">0dp</dimen>
 </resources>

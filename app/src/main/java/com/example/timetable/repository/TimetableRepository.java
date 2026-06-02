@@ -55,6 +55,10 @@ public class TimetableRepository {
         executor.execute(() -> semesterDao.setCurrentWeek(semesterId, week));
     }
 
+    public void updateSemester(Semester semester) {
+        executor.execute(() -> semesterDao.update(semester));
+    }
+
     public void deleteSemester(int semesterId) {
         executor.execute(() -> {
             courseDao.deleteAllBySemester(semesterId);

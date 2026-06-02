@@ -16,6 +16,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -43,6 +46,12 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentSettingsBinding.inflate(inflater, container, false);
+        // 适配状态栏：给根布局添加顶部内边距
+        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
+            int statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            v.setPadding(v.getPaddingLeft(), statusBarHeight, v.getPaddingRight(), v.getPaddingBottom());
+            return insets;
+        });
         return binding.getRoot();
     }
 
@@ -96,6 +105,7 @@ public class SettingsFragment extends Fragment {
         });
 
         binding.btnAddSemester.setOnClickListener(v -> showAddSemesterDialog());
+        binding.btnEditSemester.setOnClickListener(v -> showEditSemesterDialog());
         binding.btnDeleteSemester.setOnClickListener(v -> showDeleteSemesterDialog());
     }
 
@@ -178,7 +188,7 @@ public class SettingsFragment extends Fragment {
 
             dot.setOnClickListener(v -> {
                 PreferenceUtils.setThemeColor(requireContext(), color);
-                Toast.makeText(requireContext(), "主题色已保存，重启后生效", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "主题色已保存", Toast.LENGTH_SHORT).show();
                 // 刷新所有色块样式
                 for (int i = 0; i < binding.themeColorPicker.getChildCount(); i++) {
                     View child = binding.themeColorPicker.getChildAt(i);
@@ -519,6 +529,99 @@ public class SettingsFragment extends Fragment {
                     selectedDate[0] = c.getTimeInMillis();
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd (周一)", Locale.getDefault());
                     dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setText("起始: " + sdf.format(new Date(selectedDate[0])));
+                },
+                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+            datePicker.show();
+        });
+    }
+
+    /**
+     * 编辑学期对话框：修改已有学期的名称、起始日期、总周数
+     */
+    private void showEditSemesterDialog() {
+        if (allSemesters == null || allSemesters.isEmpty()) {
+            Toast.makeText(requireContext(), "没有可编辑的学期", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        int pos = binding.spinnerSemester.getSelectedItemPosition();
+        if (pos < 0 || pos >= allSemesters.size()) return;
+
+        Semester selected = allSemesters.get(pos);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("编辑学期");
+
+        LinearLayout container = new LinearLayout(requireContext());
+        container.setOrientation(LinearLayout.VERTICAL);
+        container.setPadding(32, 16, 32, 0);
+
+        final EditText inputName = new EditText(requireContext());
+        inputName.setText(selected.getName());
+        container.addView(inputName);
+
+        final EditText inputWeeks = new EditText(requireContext());
+        inputWeeks.setHint("总教学周数");
+        inputWeeks.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        inputWeeks.setText(String.valueOf(selected.getTotalWeeks()));
+        container.addView(inputWeeks);
+
+        builder.setView(container);
+
+        // 使用数组包装以支持闭包内修改
+        final long[] editedDate = {selected.getStartDate()};
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd (周一)", Locale.getDefault());
+        builder.setNeutralButton("起始: " + sdf.format(new Date(editedDate[0])), (d, w) -> {});
+
+        builder.setPositiveButton("保存", (dialog, which) -> {
+            String name = inputName.getText().toString().trim();
+            if (name.isEmpty()) {
+                Toast.makeText(requireContext(), "请输入学期名称", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            int weeks = selected.getTotalWeeks();
+            try {
+                weeks = Integer.parseInt(inputWeeks.getText().toString().trim());
+            } catch (NumberFormatException ignored) {}
+            if (weeks < 1) weeks = 1;
+
+            // 根据新起始日期重新计算当前周次
+            long today = System.currentTimeMillis();
+            long diff = today - editedDate[0];
+            int autoWeek = (int) (diff / (7L * 86400000L)) + 1;
+            if (autoWeek < 1) autoWeek = 1;
+            if (autoWeek > weeks) autoWeek = weeks;
+
+            selected.setName(name);
+            selected.setStartDate(editedDate[0]);
+            selected.setTotalWeeks(weeks);
+            selected.setCurrentWeek(autoWeek);
+
+            viewModel.updateSemester(selected);
+            Toast.makeText(requireContext(), "已更新 " + name, Toast.LENGTH_SHORT).show();
+        });
+        builder.setNegativeButton("取消", null);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // 日期选择器
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v -> {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(editedDate[0]);
+            DatePickerDialog datePicker = new DatePickerDialog(requireContext(),
+                (view, year, month, dayOfMonth) -> {
+                    Calendar c = Calendar.getInstance();
+                    c.set(year, month, dayOfMonth, 0, 0, 0);
+                    c.set(Calendar.MILLISECOND, 0);
+                    // 调整为最近的周一
+                    int dow = c.get(Calendar.DAY_OF_WEEK);
+                    int daysSinceMon = (dow + 5) % 7;
+                    c.add(Calendar.DAY_OF_MONTH, -daysSinceMon);
+                    editedDate[0] = c.getTimeInMillis();
+                    dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+                        .setText("起始: " + sdf.format(new Date(editedDate[0])));
                 },
                 cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
             datePicker.show();

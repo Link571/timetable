@@ -1,0 +1,17 @@
+<resources>
+    <!-- 平板课表尺寸（sw600dp+） -->
+    <dimen name="timetable_cell_name_text_size">16sp</dimen>
+    <dimen name="timetable_cell_room_text_size">14sp</dimen>
+    <dimen name="timetable_period_text_size">15sp</dimen>
+    <dimen name="timetable_header_text_size">17sp</dimen>
+    <dimen name="timetable_header_date_text_size">12sp</dimen>
+    <dimen name="timetable_nav_text_size">18sp</dimen>
+    <dimen name="timetable_cell_min_width">56dp</dimen>
+    <dimen name="timetable_cell_max_width">120dp</dimen>
+    <dimen name="timetable_period_label_width">60dp</dimen>
+    <dimen name="timetable_cell_height">72dp</dimen>
+    <dimen name="timetable_header_height">52dp</dimen>
+    <dimen name="dialog_button_height">60dp</dimen>
+    <dimen name="fab_margin">24dp</dimen>
+    <dimen name="settings_content_max_width">680dp</dimen>
+</resources>

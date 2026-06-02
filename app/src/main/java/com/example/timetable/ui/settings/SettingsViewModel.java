@@ -39,6 +39,10 @@ public class SettingsViewModel extends AndroidViewModel {
         });
     }
 
+    public void updateSemester(Semester semester) {
+        repository.updateSemester(semester);
+    }
+
     public void deleteSemester(int semesterId) {
         repository.deleteSemester(semesterId);
     }
