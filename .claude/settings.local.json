@@ -7,7 +7,17 @@
       "Read(//d/App/**)",
       "Bash(where javac *)",
       "Read(//c/Program Files/**)",
-      "Bash(./gradlew assembleDebug)"
+      "Bash(./gradlew assembleDebug)",
+      "Read(//c//**)",
+      "Bash(cmd.exe /c \"dir /b /s C:\\\\Users\\\\liyan\\\\AppData\\\\Local\\\\Android\\\\Sdk 2>nul\")",
+      "Bash(cmd.exe /c \"dir /s /b D:\\\\App\\\\Android\\\\SDK\\\\jre 2>nul\")",
+      "Bash(cmd.exe /c \"dir /b D:\\\\App\\\\Android\\\\Studio 2>nul\")",
+      "Bash(cmd.exe /c \"dir /s /b D:\\\\*.exe 2>nul | findstr /i java.exe\")",
+      "Bash(cmd.exe /c \"set JAVA_HOME 2>nul\")",
+      "Bash(cmd.exe /c \"echo %JAVA_HOME%\")",
+      "Bash(cmd.exe /c \"java -version 2>&1\")",
+      "Bash(cmd.exe /c \"gradlew.bat assembleDebug\")",
+      "Bash(./gradlew.bat assembleDebug)"
     ]
   }
 }

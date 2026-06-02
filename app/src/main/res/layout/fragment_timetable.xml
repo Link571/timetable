@@ -2,7 +2,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -10,280 +11,324 @@
         android:orientation="vertical"
         android:background="?android:attr/colorBackground">
 
-    <!-- 当前周次指示 -->
-    <TextView
-        android:id="@+id/tv_week_info"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingTop="10dp"
-        android:paddingBottom="6dp"
-        android:textColor="?android:attr/textColorPrimary"
-        android:textSize="15sp"
-        android:textStyle="bold" />
-
-    <!-- Timetable grid inside horizontal scroll -->
-    <HorizontalScrollView
-        android:id="@+id/hsv_timetable"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true"
-        android:scrollbars="none">
-
+        <!-- 当前周次指示（含左右切换箭头） -->
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingHorizontal="16dp"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp">
 
-            <!-- Day header row -->
-            <LinearLayout
-                android:id="@+id/header_row"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:orientation="horizontal"
-                android:background="@android:color/holo_blue_dark"
-                android:elevation="2dp">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_prev_week"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:text="‹"
+                android:textSize="20sp"
+                android:textAllCaps="false"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:cornerRadius="18dp"
+                app:strokeWidth="0dp"
+                app:backgroundTint="#33FFFFFF"
+                android:textColor="@android:color/white" />
 
-                <!-- 空占位，对应节次标签列 -->
-                <TextView
-                    android:layout_width="@dimen/timetable_period_label_width"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:textColor="@android:color/white"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tv_week_info"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
-                <!-- 周一 -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="2dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="周一"
-                        android:textColor="@android:color/white"
-                        android:textSize="@dimen/timetable_header_text_size"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text=""
-                        android:textColor="#CCFFFFFF"
-                        android:textSize="9sp" />
-                </LinearLayout>
-
-                <!-- 周二 -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="2dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="周二"
-                        android:textColor="@android:color/white"
-                        android:textSize="@dimen/timetable_header_text_size"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text=""
-                        android:textColor="#CCFFFFFF"
-                        android:textSize="9sp" />
-                </LinearLayout>
-
-                <!-- 周三 -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="2dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="周三"
-                        android:textColor="@android:color/white"
-                        android:textSize="@dimen/timetable_header_text_size"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text=""
-                        android:textColor="#CCFFFFFF"
-                        android:textSize="9sp" />
-                </LinearLayout>
-
-                <!-- 周四 -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="2dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="周四"
-                        android:textColor="@android:color/white"
-                        android:textSize="@dimen/timetable_header_text_size"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text=""
-                        android:textColor="#CCFFFFFF"
-                        android:textSize="9sp" />
-                </LinearLayout>
-
-                <!-- 周五 -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="2dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="周五"
-                        android:textColor="@android:color/white"
-                        android:textSize="@dimen/timetable_header_text_size"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text=""
-                        android:textColor="#CCFFFFFF"
-                        android:textSize="9sp" />
-                </LinearLayout>
-
-                <!-- 周六 -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="2dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="周六"
-                        android:textColor="@android:color/white"
-                        android:textSize="@dimen/timetable_header_text_size"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text=""
-                        android:textColor="#CCFFFFFF"
-                        android:textSize="9sp" />
-                </LinearLayout>
-
-                <!-- 周日 -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="2dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="周日"
-                        android:textColor="@android:color/white"
-                        android:textSize="@dimen/timetable_header_text_size"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text=""
-                        android:textColor="#CCFFFFFF"
-                        android:textSize="9sp" />
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- RecyclerView for period rows -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_timetable"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:nestedScrollingEnabled="false" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_next_week"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:text="›"
+                android:textSize="20sp"
+                android:textAllCaps="false"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:cornerRadius="18dp"
+                app:strokeWidth="0dp"
+                app:backgroundTint="#33FFFFFF"
+                android:textColor="@android:color/white" />
 
         </LinearLayout>
 
-    </HorizontalScrollView>
+        <!-- 课表网格区域（横向滚动） -->
+        <HorizontalScrollView
+            android:id="@+id/hsv_timetable"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:scrollbars="none">
 
-    <TextView
-        android:id="@+id/tv_empty"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="@string/empty_timetable"
-        android:textColor="?android:attr/textColorSecondary"
-        android:textSize="16sp"
-        android:visibility="gone" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <!-- 星期标题行 -->
+                <LinearLayout
+                    android:id="@+id/header_row"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:orientation="horizontal"
+                    android:background="?attr/colorPrimary"
+                    android:elevation="2dp">
+
+                    <!-- 空占位，对应节次标签列 -->
+                    <TextView
+                        android:layout_width="@dimen/timetable_period_label_width"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:textColor="#99FFFFFF"
+                        android:textSize="11sp"
+                        android:text="节次" />
+
+                    <!-- 周一 -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="2dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="周一"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/timetable_header_text_size"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text=""
+                            android:textColor="#CCFFFFFF"
+                            android:textSize="9sp" />
+                    </LinearLayout>
+
+                    <!-- 周二 -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="2dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="周二"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/timetable_header_text_size"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text=""
+                            android:textColor="#CCFFFFFF"
+                            android:textSize="9sp" />
+                    </LinearLayout>
+
+                    <!-- 周三 -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="2dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="周三"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/timetable_header_text_size"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text=""
+                            android:textColor="#CCFFFFFF"
+                            android:textSize="9sp" />
+                    </LinearLayout>
+
+                    <!-- 周四 -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="2dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="周四"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/timetable_header_text_size"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text=""
+                            android:textColor="#CCFFFFFF"
+                            android:textSize="9sp" />
+                    </LinearLayout>
+
+                    <!-- 周五 -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="2dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="周五"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/timetable_header_text_size"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text=""
+                            android:textColor="#CCFFFFFF"
+                            android:textSize="9sp" />
+                    </LinearLayout>
+
+                    <!-- 周六 -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="2dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="周六"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/timetable_header_text_size"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text=""
+                            android:textColor="#CCFFFFFF"
+                            android:textSize="9sp" />
+                    </LinearLayout>
+
+                    <!-- 周日 -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="2dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="周日"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/timetable_header_text_size"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text=""
+                            android:textColor="#CCFFFFFF"
+                            android:textSize="9sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- 节次网格 RecyclerView -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_timetable"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:nestedScrollingEnabled="false" />
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+        <!-- 空状态提示 -->
+        <TextView
+            android:id="@+id/tv_empty"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/empty_timetable"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="16sp"
+            android:visibility="gone" />
 
     </LinearLayout>
 
-    <!-- 添加课程 FAB -->
+    <!-- 添加课程 FAB：跟随屏幕大小自适应，固定在右下角 -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_course"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="20dp"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginBottom="@dimen/fab_margin"
         android:contentDescription="添加课程"
+        app:fabSize="normal"
+        app:maxImageSize="24dp"
         android:src="@drawable/ic_add" />
 
 </FrameLayout>

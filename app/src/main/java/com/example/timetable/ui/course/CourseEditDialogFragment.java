@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.graphics.drawable.GradientDrawable;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
@@ -19,6 +20,7 @@ import com.example.timetable.data.model.Semester;
 import com.example.timetable.databinding.DialogCourseEditBinding;
 import com.example.timetable.repository.TimetableRepository;
 import com.example.timetable.util.ColorUtils;
+import com.example.timetable.util.PreferenceUtils;
 import com.example.timetable.util.WeekPatternUtils;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -144,8 +146,9 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
     }
 
     private void setupPeriodPicker() {
+        int totalPeriods = PreferenceUtils.getTotalPeriodCount(requireContext());
         binding.npStartPeriod.setMinValue(1);
-        binding.npStartPeriod.setMaxValue(12);
+        binding.npStartPeriod.setMaxValue(totalPeriods);
         binding.npStartPeriod.setValue(1);
     }
 
@@ -193,16 +196,55 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
     }
 
     private void setupColorPicker() {
+        float density = getResources().getDisplayMetrics().density;
+        int dotSize = (int) (30 * density);
+        int margin = (int) (5 * density);
+
+        // 默认选中第一个颜色
+        selectedColor = (existingCourse != null) ? existingCourse.getColor() : ColorUtils.PREDEFINED_COLORS[0];
+
         for (int color : ColorUtils.PREDEFINED_COLORS) {
+            android.graphics.drawable.GradientDrawable drawable = new android.graphics.drawable.GradientDrawable();
+            drawable.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+            drawable.setColor(color);
+            drawable.setStroke((int) (1.5f * density), 0x33000000);
+
             View dot = new View(requireContext());
-            int size = (int) (32 * getResources().getDisplayMetrics().density);
-            ViewGroup.MarginLayoutParams params = new ViewGroup.MarginLayoutParams(size, size);
-            params.setMargins(4, 4, 4, 4);
+            ViewGroup.MarginLayoutParams params = new ViewGroup.MarginLayoutParams(dotSize, dotSize);
+            params.setMargins(margin, margin, margin, margin);
             dot.setLayoutParams(params);
-            dot.setBackgroundColor(color);
-            dot.setOnClickListener(v -> selectedColor = color);
+            dot.setBackground(drawable);
+            dot.setElevation(2 * density);
+
+            dot.setOnClickListener(v -> {
+                selectedColor = color;
+                // 更新选中态
+                for (int i = 0; i < binding.colorPicker.getChildCount(); i++) {
+                    View child = binding.colorPicker.getChildAt(i);
+                    android.graphics.drawable.GradientDrawable gd =
+                        (android.graphics.drawable.GradientDrawable) child.getBackground();
+                    if (ColorUtils.PREDEFINED_COLORS[i] == color) {
+                        gd.setStroke((int) (3 * density), 0xFFFFFFFF);
+                    } else {
+                        gd.setStroke((int) (1.5f * density), 0x33000000);
+                    }
+                }
+            });
             binding.colorPicker.addView(dot);
         }
+
+        // 初始选中态
+        binding.colorPicker.post(() -> {
+            for (int i = 0; i < binding.colorPicker.getChildCount(); i++) {
+                if (ColorUtils.PREDEFINED_COLORS[i] == selectedColor) {
+                    View child = binding.colorPicker.getChildAt(i);
+                    android.graphics.drawable.GradientDrawable gd =
+                        (android.graphics.drawable.GradientDrawable) child.getBackground();
+                    gd.setStroke((int) (3 * density), 0xFFFFFFFF);
+                    break;
+                }
+            }
+        });
     }
 
     private void fillExistingData(Course course, Semester semester) {

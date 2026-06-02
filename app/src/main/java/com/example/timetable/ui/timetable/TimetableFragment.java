@@ -85,6 +85,19 @@ public class TimetableFragment extends Fragment {
             }
         });
 
+        // 周次左右切换箭头
+        binding.btnPrevWeek.setOnClickListener(v -> viewModel.prevWeek());
+        binding.btnNextWeek.setOnClickListener(v -> viewModel.nextWeek());
+
+        // 根据当前周次启用/禁用切换按钮
+        viewModel.getCurrentWeek().observe(getViewLifecycleOwner(), week -> {
+            if (week != null) {
+                binding.btnPrevWeek.setEnabled(week > 1);
+                // nextWeek 的边界由 ViewModel 内部判断，此处默认可点
+                binding.btnNextWeek.setEnabled(true);
+            }
+        });
+
         // FAB 添加课程（不预设星期和节次）
         binding.fabAddCourse.setOnClickListener(v -> {
             CourseEditDialogFragment dialog = CourseEditDialogFragment.newInstance(null, 0, 0);

@@ -89,13 +89,15 @@ public class WeekPatternUtils {
     public static String getPeriodTime(Context context, int period) {
         if (context == null) return getPeriodTime(period);
         String[] times = PreferenceUtils.getPeriodTimes(context);
-        return (period >= 1 && period <= 12) ? times[period - 1] : "";
+        int total = times.length;
+        return (period >= 1 && period <= total) ? times[period - 1] : "";
     }
 
     public static int getPeriodStartHour(Context context, int period) {
         if (context == null) return getPeriodStartHour(period);
         String[] times = PreferenceUtils.getPeriodTimes(context);
-        if (period >= 1 && period <= 12) {
+        int total = times.length;
+        if (period >= 1 && period <= total) {
             return PreferenceUtils.parsePeriodStartHour(times[period - 1]);
         }
         return 8;
@@ -104,7 +106,8 @@ public class WeekPatternUtils {
     public static int getPeriodStartMinute(Context context, int period) {
         if (context == null) return getPeriodStartMinute(period);
         String[] times = PreferenceUtils.getPeriodTimes(context);
-        if (period >= 1 && period <= 12) {
+        int total = times.length;
+        if (period >= 1 && period <= total) {
             return PreferenceUtils.parsePeriodStartMinute(times[period - 1]);
         }
         return 0;

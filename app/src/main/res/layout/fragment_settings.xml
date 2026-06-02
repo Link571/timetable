@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="?android:attr/colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,55 +12,66 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Semester Section -->
+        <!-- ====== 学期管理 ====== -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="学期管理"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+            android:textColor="?attr/colorPrimary"
+            android:textAllCaps="true"
+            android:letterSpacing="0.08"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="4dp" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="2dp"
-            app:cardCornerRadius="8dp"
-            android:layout_marginBottom="16dp">
+            app:cardElevation="1dp"
+            app:cardCornerRadius="12dp"
+            app:strokeWidth="0dp"
+            android:layout_marginBottom="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="16dp">
 
                 <Spinner
                     android:id="@+id/spinner_semester"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp" />
+                    android:layout_height="48dp"
+                    android:background="@drawable/abc_edit_text_material" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="4dp">
+                    android:layout_marginTop="8dp">
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_add_semester"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="添加新学期"
-                        style="@style/Widget.MaterialComponents.Button.TextButton" />
+                        android:textAllCaps="false"
+                        app:cornerRadius="8dp"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_marginEnd="4dp" />
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_delete_semester"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/delete_semester"
-                        android:textColor="@android:color/holo_red_dark"
-                        style="@style/Widget.MaterialComponents.Button.TextButton" />
+                        android:textColor="@color/error_red"
+                        android:textAllCaps="false"
+                        app:cornerRadius="8dp"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_marginStart="4dp" />
 
                 </LinearLayout>
 
@@ -67,27 +79,31 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Current Week Section -->
+        <!-- ====== 当前周次 ====== -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="当前周次"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+            android:textColor="?attr/colorPrimary"
+            android:textAllCaps="true"
+            android:letterSpacing="0.08"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="4dp" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="2dp"
-            app:cardCornerRadius="8dp"
-            android:layout_marginBottom="16dp">
+            app:cardElevation="1dp"
+            app:cardCornerRadius="12dp"
+            app:strokeWidth="0dp"
+            android:layout_marginBottom="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="16dp">
 
                 <TextView
                     android:id="@+id/tv_auto_week"
@@ -102,22 +118,25 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="12dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="手动设置："
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+                        android:text="手动调整"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                        android:layout_marginEnd="8dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_week_minus"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
                         android:text="−"
-                        android:textSize="20sp"
+                        android:textSize="18sp"
                         android:textAllCaps="false"
-                        app:cornerRadius="20dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:cornerRadius="18dp"
                         app:strokeWidth="1dp"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
@@ -128,17 +147,20 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="第1周"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                        android:textStyle="bold" />
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorPrimary" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_week_plus"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
                         android:text="+"
-                        android:textSize="20sp"
+                        android:textSize="18sp"
                         android:textAllCaps="false"
-                        app:cornerRadius="20dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:cornerRadius="18dp"
                         app:strokeWidth="1dp"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
@@ -148,27 +170,31 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Reminder Section -->
+        <!-- ====== 上课提醒 ====== -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="上课提醒"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+            android:textColor="?attr/colorPrimary"
+            android:textAllCaps="true"
+            android:letterSpacing="0.08"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="4dp" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="2dp"
-            app:cardCornerRadius="8dp"
-            android:layout_marginBottom="16dp">
+            app:cardElevation="1dp"
+            app:cardCornerRadius="12dp"
+            app:strokeWidth="0dp"
+            android:layout_marginBottom="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -195,22 +221,25 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginTop="12dp">
+                    android:layout_marginTop="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="提前提醒："
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+                        android:text="提前"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                        android:layout_marginEnd="8dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_minutes_minus"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
                         android:text="−"
-                        android:textSize="20sp"
+                        android:textSize="18sp"
                         android:textAllCaps="false"
-                        app:cornerRadius="20dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:cornerRadius="18dp"
                         app:strokeWidth="1dp"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
@@ -221,17 +250,20 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="15 分钟"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                        android:textStyle="bold" />
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorPrimary" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_minutes_plus"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
                         android:text="+"
-                        android:textSize="20sp"
+                        android:textSize="18sp"
                         android:textAllCaps="false"
-                        app:cornerRadius="20dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:cornerRadius="18dp"
                         app:strokeWidth="1dp"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
@@ -241,27 +273,31 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Week Mode Section -->
+        <!-- ====== 课表显示模式 ====== -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/week_mode_title"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+            android:textColor="?attr/colorPrimary"
+            android:textAllCaps="true"
+            android:letterSpacing="0.08"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="4dp" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="2dp"
-            app:cardCornerRadius="8dp"
-            android:layout_marginBottom="16dp">
+            app:cardElevation="1dp"
+            app:cardCornerRadius="12dp"
+            app:strokeWidth="0dp"
+            android:layout_marginBottom="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -289,74 +325,92 @@
                     android:text="@string/week_mode_hint"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                     android:textColor="?android:attr/textColorSecondary"
-                    android:layout_marginTop="4dp" />
+                    android:layout_marginTop="6dp" />
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Period Times Section -->
+        <!-- ====== 课程时间设置 ====== -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="课节时间"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:text="课程时间设置"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+            android:textColor="?attr/colorPrimary"
+            android:textAllCaps="true"
+            android:letterSpacing="0.08"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="4dp" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="2dp"
-            app:cardCornerRadius="8dp"
-            android:layout_marginBottom="16dp">
+            app:cardElevation="1dp"
+            app:cardCornerRadius="12dp"
+            app:strokeWidth="0dp"
+            android:layout_marginBottom="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="16dp">
 
-                <Button
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="设置每日上午/下午/晚课节数及每节课的起止时间"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:layout_marginBottom="12dp" />
+
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_edit_period_times"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="编辑每节课时间"
+                    android:text="设置课程时间"
+                    android:textAllCaps="false"
+                    app:cornerRadius="8dp"
                     style="@style/Widget.MaterialComponents.Button.TextButton" />
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Theme Color Section -->
+        <!-- ====== 主题颜色 ====== -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="主题颜色"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+            android:textColor="?attr/colorPrimary"
+            android:textAllCaps="true"
+            android:letterSpacing="0.08"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="4dp" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="2dp"
-            app:cardCornerRadius="8dp"
-            android:layout_marginBottom="16dp">
+            app:cardElevation="1dp"
+            app:cardCornerRadius="12dp"
+            app:strokeWidth="0dp"
+            android:layout_marginBottom="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="选择主题色（重启后生效）"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                     android:textColor="?android:attr/textColorSecondary"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="12dp" />
 
                 <LinearLayout
                     android:id="@+id/theme_color_picker"
@@ -369,32 +423,40 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- About Section -->
+        <!-- ====== 关于 ====== -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="关于"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+            android:textColor="?attr/colorPrimary"
+            android:textAllCaps="true"
+            android:letterSpacing="0.08"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="4dp" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="2dp"
-            app:cardCornerRadius="8dp">
+            app:cardElevation="1dp"
+            app:cardCornerRadius="12dp"
+            app:strokeWidth="0dp"
+            android:layout_marginBottom="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="16dp"
+                android:gravity="center_vertical">
 
                 <TextView
+                    android:id="@+id/tv_app_version"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="课程表 v1.0"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"

@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <!-- Period label -->
+    <!-- 节次标签 -->
     <TextView
         android:id="@+id/tv_period_label"
         android:layout_width="@dimen/timetable_period_label_width"
@@ -16,22 +16,22 @@
         android:background="?android:attr/colorBackground"
         android:padding="2dp" />
 
-    <!-- Monday cell -->
+    <!-- 周一 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_mon"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/timetable_cell_height"
-        app:cardCornerRadius="2dp"
+        app:cardCornerRadius="4dp"
         app:cardElevation="1dp"
         app:strokeWidth="0dp"
-        android:layout_margin="1dp">
+        android:layout_margin="1.5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="2dp">
+            android:padding="3dp">
 
             <TextView
                 android:id="@+id/tv_mon_name"
@@ -42,14 +42,15 @@
                 android:gravity="center"
                 android:maxLines="2"
                 android:ellipsize="end"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_mon_room"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/timetable_cell_room_text_size"
-                android:textColor="#CCFFFFFF"
+                android:textColor="#E0FFFFFF"
                 android:gravity="center"
                 android:singleLine="true"
                 android:ellipsize="end"
@@ -59,22 +60,22 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Tuesday -->
+    <!-- 周二 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_tue"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/timetable_cell_height"
-        app:cardCornerRadius="2dp"
+        app:cardCornerRadius="4dp"
         app:cardElevation="1dp"
         app:strokeWidth="0dp"
-        android:layout_margin="1dp">
+        android:layout_margin="1.5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="2dp">
+            android:padding="3dp">
 
             <TextView
                 android:id="@+id/tv_tue_name"
@@ -85,14 +86,15 @@
                 android:gravity="center"
                 android:maxLines="2"
                 android:ellipsize="end"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_tue_room"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/timetable_cell_room_text_size"
-                android:textColor="#CCFFFFFF"
+                android:textColor="#E0FFFFFF"
                 android:gravity="center"
                 android:singleLine="true"
                 android:ellipsize="end"
@@ -102,22 +104,22 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Wednesday -->
+    <!-- 周三 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_wed"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/timetable_cell_height"
-        app:cardCornerRadius="2dp"
+        app:cardCornerRadius="4dp"
         app:cardElevation="1dp"
         app:strokeWidth="0dp"
-        android:layout_margin="1dp">
+        android:layout_margin="1.5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="2dp">
+            android:padding="3dp">
 
             <TextView
                 android:id="@+id/tv_wed_name"
@@ -128,14 +130,15 @@
                 android:gravity="center"
                 android:maxLines="2"
                 android:ellipsize="end"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_wed_room"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/timetable_cell_room_text_size"
-                android:textColor="#CCFFFFFF"
+                android:textColor="#E0FFFFFF"
                 android:gravity="center"
                 android:singleLine="true"
                 android:ellipsize="end"
@@ -145,22 +148,22 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Thursday -->
+    <!-- 周四 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_thu"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/timetable_cell_height"
-        app:cardCornerRadius="2dp"
+        app:cardCornerRadius="4dp"
         app:cardElevation="1dp"
         app:strokeWidth="0dp"
-        android:layout_margin="1dp">
+        android:layout_margin="1.5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="2dp">
+            android:padding="3dp">
 
             <TextView
                 android:id="@+id/tv_thu_name"
@@ -171,14 +174,15 @@
                 android:gravity="center"
                 android:maxLines="2"
                 android:ellipsize="end"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_thu_room"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/timetable_cell_room_text_size"
-                android:textColor="#CCFFFFFF"
+                android:textColor="#E0FFFFFF"
                 android:gravity="center"
                 android:singleLine="true"
                 android:ellipsize="end"
@@ -188,22 +192,22 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Friday -->
+    <!-- 周五 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_fri"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/timetable_cell_height"
-        app:cardCornerRadius="2dp"
+        app:cardCornerRadius="4dp"
         app:cardElevation="1dp"
         app:strokeWidth="0dp"
-        android:layout_margin="1dp">
+        android:layout_margin="1.5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="2dp">
+            android:padding="3dp">
 
             <TextView
                 android:id="@+id/tv_fri_name"
@@ -214,14 +218,15 @@
                 android:gravity="center"
                 android:maxLines="2"
                 android:ellipsize="end"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_fri_room"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/timetable_cell_room_text_size"
-                android:textColor="#CCFFFFFF"
+                android:textColor="#E0FFFFFF"
                 android:gravity="center"
                 android:singleLine="true"
                 android:ellipsize="end"
@@ -231,22 +236,22 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Saturday -->
+    <!-- 周六 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_sat"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/timetable_cell_height"
-        app:cardCornerRadius="2dp"
+        app:cardCornerRadius="4dp"
         app:cardElevation="1dp"
         app:strokeWidth="0dp"
-        android:layout_margin="1dp">
+        android:layout_margin="1.5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="2dp">
+            android:padding="3dp">
 
             <TextView
                 android:id="@+id/tv_sat_name"
@@ -257,14 +262,15 @@
                 android:gravity="center"
                 android:maxLines="2"
                 android:ellipsize="end"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_sat_room"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/timetable_cell_room_text_size"
-                android:textColor="#CCFFFFFF"
+                android:textColor="#E0FFFFFF"
                 android:gravity="center"
                 android:singleLine="true"
                 android:ellipsize="end"
@@ -274,22 +280,22 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Sunday -->
+    <!-- 周日 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_sun"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/timetable_cell_height"
-        app:cardCornerRadius="2dp"
+        app:cardCornerRadius="4dp"
         app:cardElevation="1dp"
         app:strokeWidth="0dp"
-        android:layout_margin="1dp">
+        android:layout_margin="1.5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="2dp">
+            android:padding="3dp">
 
             <TextView
                 android:id="@+id/tv_sun_name"
@@ -300,14 +306,15 @@
                 android:gravity="center"
                 android:maxLines="2"
                 android:ellipsize="end"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_sun_room"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/timetable_cell_room_text_size"
-                android:textColor="#CCFFFFFF"
+                android:textColor="#E0FFFFFF"
                 android:gravity="center"
                 android:singleLine="true"
                 android:ellipsize="end"

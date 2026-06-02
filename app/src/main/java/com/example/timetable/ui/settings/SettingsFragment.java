@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.graphics.drawable.GradientDrawable;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
@@ -17,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.timetable.BuildConfig;
 import com.example.timetable.data.model.Semester;
 import com.example.timetable.databinding.FragmentSettingsBinding;
 import com.example.timetable.R;
@@ -52,7 +55,10 @@ public class SettingsFragment extends Fragment {
         setupThemeColorPicker();
         setupWeekModeToggle();
 
-        binding.btnEditPeriodTimes.setOnClickListener(v -> showEditPeriodTimesDialog());
+        // 动态设置版本号
+        binding.tvAppVersion.setText(getString(R.string.app_version, BuildConfig.VERSION_NAME));
+
+        binding.btnEditPeriodTimes.setOnClickListener(v -> showCourseTimeSettingsDialog());
 
         viewModel.getAllSemesters().observe(getViewLifecycleOwner(), semesters -> {
             allSemesters = semesters;
@@ -144,30 +150,46 @@ public class SettingsFragment extends Fragment {
 
     private void setupThemeColorPicker() {
         int currentColor = PreferenceUtils.getThemeColor(requireContext());
+        float density = getResources().getDisplayMetrics().density;
+        int dotSize = (int) (32 * density);
+        int margin = (int) (6 * density);
 
         for (int color : ColorUtils.PREDEFINED_COLORS) {
-            View dot = new View(requireContext());
-            int size = (int) (40 * getResources().getDisplayMetrics().density);
-            ViewGroup.MarginLayoutParams params = new ViewGroup.MarginLayoutParams(size, size);
-            params.setMargins(6, 6, 6, 6);
-            dot.setLayoutParams(params);
-            dot.setBackgroundColor(color);
+            // 创建圆形色块（带描边作为选中指示）
+            android.graphics.drawable.GradientDrawable drawable = new android.graphics.drawable.GradientDrawable();
+            drawable.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+            drawable.setColor(color);
 
             if (color == currentColor) {
-                dot.setScaleX(1.15f);
-                dot.setScaleY(1.15f);
+                // 选中态：白色粗边框 + 轻微放大
+                drawable.setStroke((int) (3 * density), 0xFFFFFFFF);
+                drawable.setAlpha(255);
+            } else {
+                // 未选中：浅灰细边框
+                drawable.setStroke((int) (1 * density), 0xDDDDDDDD);
             }
+
+            View dot = new View(requireContext());
+            ViewGroup.MarginLayoutParams params = new ViewGroup.MarginLayoutParams(dotSize, dotSize);
+            params.setMargins(margin, margin, margin, margin);
+            dot.setLayoutParams(params);
+            dot.setBackground(drawable);
+            dot.setElevation(2 * density);
 
             dot.setOnClickListener(v -> {
                 PreferenceUtils.setThemeColor(requireContext(), color);
                 Toast.makeText(requireContext(), "主题色已保存，重启后生效", Toast.LENGTH_SHORT).show();
+                // 刷新所有色块样式
                 for (int i = 0; i < binding.themeColorPicker.getChildCount(); i++) {
                     View child = binding.themeColorPicker.getChildAt(i);
-                    child.setScaleX(1.0f);
-                    child.setScaleY(1.0f);
+                    android.graphics.drawable.GradientDrawable gd = (android.graphics.drawable.GradientDrawable) child.getBackground();
+                    int childColor = ColorUtils.PREDEFINED_COLORS[i];
+                    if (childColor == color) {
+                        gd.setStroke((int) (3 * density), 0xFFFFFFFF);
+                    } else {
+                        gd.setStroke((int) (1 * density), 0xDDDDDDDD);
+                    }
                 }
-                v.setScaleX(1.15f);
-                v.setScaleY(1.15f);
             });
             binding.themeColorPicker.addView(dot);
         }
@@ -202,45 +224,213 @@ public class SettingsFragment extends Fragment {
             .show();
     }
 
-    private void showEditPeriodTimesDialog() {
+    /**
+     * 课程时间设置弹窗：设置上午/下午/晚课节数和每节课起止时间
+     */
+    private void showCourseTimeSettingsDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("编辑节次时间");
+        builder.setTitle("课程时间设置");
+
+        // 读取当前配置
+        int[] counts = {
+            PreferenceUtils.getMorningCount(requireContext()),
+            PreferenceUtils.getAfternoonCount(requireContext()),
+            PreferenceUtils.getEveningCount(requireContext())
+        };
+        String[] currentTimes = PreferenceUtils.getPeriodTimes(requireContext());
+
+        // 可变的 period 时间列表
+        final String[][] mutableTimes = {currentTimes.clone()};
+        // 动态编辑框引用列表
+        final java.util.ArrayList<EditText> startEditorList = new java.util.ArrayList<>();
+        final java.util.ArrayList<EditText> endEditorList = new java.util.ArrayList<>();
 
         ScrollView scrollView = new ScrollView(requireContext());
-        LinearLayout container = new LinearLayout(requireContext());
-        container.setOrientation(LinearLayout.VERTICAL);
-        container.setPadding(32, 16, 32, 0);
+        LinearLayout rootLayout = new LinearLayout(requireContext());
+        rootLayout.setOrientation(LinearLayout.VERTICAL);
+        rootLayout.setPadding(24, 12, 24, 0);
 
-        String[] currentTimes = PreferenceUtils.getPeriodTimes(requireContext());
-        EditText[] editTexts = new EditText[12];
+        String[] sectionTitles = {"上午课程", "下午课程", "晚课"};
+        String[] sectionLabels = {"上午", "下午", "晚课"};
 
-        for (int i = 0; i < 12; i++) {
-            EditText et = new EditText(requireContext());
-            et.setText(currentTimes[i]);
-            et.setHint("第" + (i + 1) + "节 如: 08:00-08:45");
-            et.setSingleLine(true);
-            editTexts[i] = et;
-            container.addView(et);
+        LinearLayout[] sectionTimeContainers = new LinearLayout[3];
+        TextView[] countTextViews = new TextView[3];
+
+        for (int sec = 0; sec < 3; sec++) {
+            final int sectionIndex = sec;
+
+            // 区块标题
+            TextView secTitle = new TextView(requireContext());
+            secTitle.setText(sectionTitles[sec]);
+            secTitle.setTextSize(16);
+            secTitle.setPadding(0, 12, 0, 4);
+            rootLayout.addView(secTitle);
+
+            // 数量调节行
+            LinearLayout stepperRow = new LinearLayout(requireContext());
+            stepperRow.setOrientation(LinearLayout.HORIZONTAL);
+            stepperRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
+
+            com.google.android.material.button.MaterialButton btnMinus = new com.google.android.material.button.MaterialButton(requireContext());
+            btnMinus.setText("−");
+            btnMinus.setTextSize(18);
+            btnMinus.setLayoutParams(new LinearLayout.LayoutParams(80, 80));
+
+            TextView tvCount = new TextView(requireContext());
+            tvCount.setText(String.valueOf(counts[sec]));
+            tvCount.setTextSize(18);
+            tvCount.setGravity(android.view.Gravity.CENTER);
+            tvCount.setLayoutParams(new LinearLayout.LayoutParams(0,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+            countTextViews[sec] = tvCount;
+
+            com.google.android.material.button.MaterialButton btnPlus = new com.google.android.material.button.MaterialButton(requireContext());
+            btnPlus.setText("+");
+            btnPlus.setTextSize(18);
+            btnPlus.setLayoutParams(new LinearLayout.LayoutParams(80, 80));
+
+            stepperRow.addView(btnMinus);
+            stepperRow.addView(tvCount);
+            stepperRow.addView(btnPlus);
+            rootLayout.addView(stepperRow);
+
+            // 节次时间编辑容器
+            LinearLayout timeContainer = new LinearLayout(requireContext());
+            timeContainer.setOrientation(LinearLayout.VERTICAL);
+            timeContainer.setPadding(0, 4, 0, 4);
+            sectionTimeContainers[sec] = timeContainer;
+            rootLayout.addView(timeContainer);
+
+            // 分隔线
+            View divider = new View(requireContext());
+            divider.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 2));
+            divider.setBackgroundColor(0x33000000);
+            rootLayout.addView(divider);
+
+            btnMinus.setOnClickListener(v -> {
+                if (counts[sectionIndex] <= 1) return;
+                counts[sectionIndex]--;
+                refreshSectionRows(counts, mutableTimes, sectionTimeContainers, countTextViews,
+                    sectionLabels, startEditorList, endEditorList);
+            });
+            btnPlus.setOnClickListener(v -> {
+                counts[sectionIndex]++;
+                refreshSectionRows(counts, mutableTimes, sectionTimeContainers, countTextViews,
+                    sectionLabels, startEditorList, endEditorList);
+            });
         }
 
-        scrollView.addView(container);
+        // 初始渲染
+        refreshSectionRows(counts, mutableTimes, sectionTimeContainers, countTextViews,
+            sectionLabels, startEditorList, endEditorList);
+
+        scrollView.addView(rootLayout);
         builder.setView(scrollView);
 
         builder.setPositiveButton("保存", (dialog, which) -> {
-            String[] newTimes = new String[12];
-            for (int i = 0; i < 12; i++) {
-                String t = editTexts[i].getText().toString().trim();
-                if (t.isEmpty()) {
-                    newTimes[i] = PreferenceUtils.DEFAULT_PERIOD_TIMES[i];
+            int total = counts[0] + counts[1] + counts[2];
+            String[] newTimes = new String[total];
+            for (int i = 0; i < total; i++) {
+                String start = (i < startEditorList.size()) ? startEditorList.get(i).getText().toString().trim() : "";
+                String end = (i < endEditorList.size()) ? endEditorList.get(i).getText().toString().trim() : "";
+                if (start.isEmpty() || end.isEmpty() || !start.matches("\\d{2}:\\d{2}") || !end.matches("\\d{2}:\\d{2}")) {
+                    newTimes[i] = (i < PreferenceUtils.DEFAULT_PERIOD_TIMES.length)
+                        ? PreferenceUtils.DEFAULT_PERIOD_TIMES[i]
+                        : String.format("%02d:00-%02d:45", 8 + i, 8 + i);
                 } else {
-                    newTimes[i] = t;
+                    newTimes[i] = start + "-" + end;
                 }
             }
+            PreferenceUtils.setMorningCount(requireContext(), counts[0]);
+            PreferenceUtils.setAfternoonCount(requireContext(), counts[1]);
+            PreferenceUtils.setEveningCount(requireContext(), counts[2]);
             PreferenceUtils.setPeriodTimes(requireContext(), newTimes);
-            Toast.makeText(requireContext(), "节次时间已保存", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "课程时间已保存，请刷新课表查看", Toast.LENGTH_SHORT).show();
         });
         builder.setNegativeButton("取消", null);
         builder.show();
+    }
+
+    /**
+     * 当任一区块节数变更时，重建所有区块的节次时间编辑行
+     */
+    private void refreshSectionRows(int[] counts, String[][] mutableTimes,
+                                     LinearLayout[] containers, TextView[] countTextViews,
+                                     String[] sectionLabels,
+                                     java.util.ArrayList<EditText> startEditorList,
+                                     java.util.ArrayList<EditText> endEditorList) {
+        int newTotal = counts[0] + counts[1] + counts[2];
+        String[] oldTimes = mutableTimes[0];
+        String[] newTimes = new String[newTotal];
+
+        for (int i = 0; i < newTotal; i++) {
+            if (i < oldTimes.length) {
+                newTimes[i] = oldTimes[i];
+            } else {
+                newTimes[i] = (i < PreferenceUtils.DEFAULT_PERIOD_TIMES.length)
+                    ? PreferenceUtils.DEFAULT_PERIOD_TIMES[i]
+                    : String.format("%02d:00-%02d:45", 8 + i, 8 + i);
+            }
+        }
+        mutableTimes[0] = newTimes;
+        startEditorList.clear();
+        endEditorList.clear();
+
+        int periodIdx = 0;
+        for (int sec = 0; sec < 3; sec++) {
+            countTextViews[sec].setText(String.valueOf(counts[sec]));
+            LinearLayout container = containers[sec];
+            container.removeAllViews();
+
+            for (int local = 0; local < counts[sec]; local++) {
+                int globalIdx = periodIdx + local;
+                String label = sectionLabels[sec] + "第" + (local + 1) + "节";
+                String timeStr = newTimes[globalIdx];
+                String[] parts = timeStr.split("-");
+
+                LinearLayout row = new LinearLayout(requireContext());
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+                row.setPadding(0, 2, 0, 2);
+
+                TextView labelView = new TextView(requireContext());
+                labelView.setText(label);
+                labelView.setTextSize(12);
+                labelView.setLayoutParams(new LinearLayout.LayoutParams(
+                    (int) (75 * getResources().getDisplayMetrics().density),
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
+
+                EditText etStart = new EditText(requireContext());
+                etStart.setText(parts.length > 0 ? parts[0] : "08:00");
+                etStart.setSingleLine(true);
+                etStart.setTextSize(13);
+                etStart.setLayoutParams(new LinearLayout.LayoutParams(0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+
+                TextView sep = new TextView(requireContext());
+                sep.setText("至");
+                sep.setTextSize(13);
+                sep.setPadding(4, 0, 4, 0);
+
+                EditText etEnd = new EditText(requireContext());
+                etEnd.setText(parts.length > 1 ? parts[1] : "08:45");
+                etEnd.setSingleLine(true);
+                etEnd.setTextSize(13);
+                etEnd.setLayoutParams(new LinearLayout.LayoutParams(0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+
+                row.addView(labelView);
+                row.addView(etStart);
+                row.addView(sep);
+                row.addView(etEnd);
+                container.addView(row);
+
+                startEditorList.add(etStart);
+                endEditorList.add(etEnd);
+            }
+            periodIdx += counts[sec];
+        }
     }
 
     private void showAddSemesterDialog() {
@@ -298,7 +488,13 @@ public class SettingsFragment extends Fragment {
             semester.setName(name);
             semester.setStartDate(selectedDate[0]);
             semester.setTotalWeeks(weeks);
-            semester.setCurrentWeek(1);
+            // 根据日期自动计算当前周次
+            long today = System.currentTimeMillis();
+            long diff = today - selectedDate[0];
+            int autoWeek = (int) (diff / (7L * 86400000L)) + 1;
+            if (autoWeek < 1) autoWeek = 1;
+            if (autoWeek > weeks) autoWeek = weeks;
+            semester.setCurrentWeek(autoWeek);
 
             viewModel.addSemester(semester);
             Toast.makeText(requireContext(), "已添加 " + name, Toast.LENGTH_SHORT).show();

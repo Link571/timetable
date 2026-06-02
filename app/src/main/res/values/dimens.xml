@@ -12,4 +12,7 @@
     <dimen name="timetable_cell_max_width">80dp</dimen>
     <dimen name="timetable_period_label_width">48dp</dimen>
     <dimen name="timetable_cell_height">58dp</dimen>
+
+    <!-- FAB 边距，随屏幕大小自适应 -->
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

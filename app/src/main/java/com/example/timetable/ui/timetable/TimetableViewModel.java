@@ -12,6 +12,7 @@ import com.example.timetable.data.model.Course;
 import com.example.timetable.data.model.Semester;
 import com.example.timetable.repository.TimetableRepository;
 import com.example.timetable.util.WeekPatternUtils;
+import com.example.timetable.util.PreferenceUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,6 +27,7 @@ public class TimetableViewModel extends AndroidViewModel {
     private final MutableLiveData<String[]> headerDates = new MutableLiveData<>();
 
     private Semester activeSemester;
+    private int lastLoadedSemesterId = -1;
     private List<Course> allCourses = new ArrayList<>();
     private LiveData<List<Course>> currentCoursesLiveData;
     private Observer<List<Course>> coursesObserver;
@@ -38,9 +40,10 @@ public class TimetableViewModel extends AndroidViewModel {
             AppDatabase.getInstance(application).semesterDao()
         );
 
-        // Initialize with 12 empty rows so RecyclerView has data before Room query completes
+        // 初始化空行（根据配置的节次数动态生成）
+        int totalPeriods = PreferenceUtils.getTotalPeriodCount(application);
         List<Course[]> initialRows = new ArrayList<>();
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < totalPeriods; i++) {
             initialRows.add(new Course[8]);
         }
         gridData.setValue(initialRows);
@@ -54,13 +57,25 @@ public class TimetableViewModel extends AndroidViewModel {
         semesterObserver = semester -> {
             activeSemester = semester;
             if (semester != null) {
-                currentWeek.postValue(semester.getCurrentWeek());
+                if (semester.getId() != lastLoadedSemesterId) {
+                    // 首次加载或切换学期：根据日期自动计算当前周次
+                    int autoWeek = calculateCurrentWeek(semester);
+                    currentWeek.postValue(autoWeek);
+                    if (autoWeek != semester.getCurrentWeek()) {
+                        repository.setCurrentWeek(semester.getId(), autoWeek);
+                    }
+                    lastLoadedSemesterId = semester.getId();
+                } else {
+                    // 同一学期内 DB 更新（如手动切周）：直接使用 DB 中的值
+                    currentWeek.postValue(semester.getCurrentWeek());
+                }
                 if (currentCoursesLiveData != null) {
                     currentCoursesLiveData.removeObserver(coursesObserver);
                 }
                 currentCoursesLiveData = repository.getCoursesBySemester(semester.getId());
                 currentCoursesLiveData.observeForever(coursesObserver);
             } else {
+                lastLoadedSemesterId = -1;
                 allCourses = new ArrayList<>();
                 currentWeek.postValue(1);
                 rebuildGrid();
@@ -96,6 +111,18 @@ public class TimetableViewModel extends AndroidViewModel {
         }
     }
 
+    /**
+     * 根据当天日期和学期起始日自动计算当前周次，结果钳位在 [1, totalWeeks]
+     */
+    private int calculateCurrentWeek(Semester semester) {
+        long today = System.currentTimeMillis();
+        long diff = today - semester.getStartDate();
+        int autoWeek = (int) (diff / (7L * 86400000L)) + 1;
+        if (autoWeek < 1) autoWeek = 1;
+        if (autoWeek > semester.getTotalWeeks()) autoWeek = semester.getTotalWeeks();
+        return autoWeek;
+    }
+
     private void rebuildGrid() {
         int week = currentWeek.getValue() != null ? currentWeek.getValue() : 1;
 
@@ -116,8 +143,9 @@ public class TimetableViewModel extends AndroidViewModel {
             weekInfo.postValue("第" + week + "周");
         }
 
+        int totalPeriods = PreferenceUtils.getTotalPeriodCount(getApplication());
         List<Course[]> rows = new ArrayList<>();
-        for (int period = 1; period <= 12; period++) {
+        for (int period = 1; period <= totalPeriods; period++) {
             rows.add(new Course[8]);
         }
 
@@ -127,7 +155,7 @@ public class TimetableViewModel extends AndroidViewModel {
                 if (day >= 1 && day <= 7) {
                     int startIdx = course.getStartPeriod() - 1;
                     int endIdx = startIdx + course.getDuration(); // 结束节次（不含）
-                    for (int idx = startIdx; idx < endIdx && idx < 12; idx++) {
+                    for (int idx = startIdx; idx < endIdx && idx < totalPeriods; idx++) {
                         if (idx >= 0) {
                             rows.get(idx)[day] = course;
                         }
