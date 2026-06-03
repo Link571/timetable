@@ -3,8 +3,11 @@ package com.example.timetable.ui.timetable;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,6 +33,28 @@ public class TimetableFragment extends Fragment {
     private FragmentTimetableBinding binding;
     private TimetableViewModel viewModel;
     private TimetableAdapter adapter;
+    // 滑动切换周次的动画状态
+    private boolean isWeekAnimating = false;
+    private int pendingWeekDir = 0; // 1=下一周, -1=上一周
+    // 防卡死：动画超时后强制重置
+    private final Runnable animationTimeoutRunnable = () -> {
+        if (isWeekAnimating) {
+            isWeekAnimating = false;
+            pendingWeekDir = 0;
+            if (binding != null && binding.timetableContainer != null) {
+                binding.timetableContainer.animate().cancel();
+                binding.timetableContainer.setTranslationX(0f);
+                binding.timetableContainer.setAlpha(1f);
+                binding.timetableContainer.setScaleX(1f);
+                binding.timetableContainer.setScaleY(1f);
+            }
+        }
+    };
+    // 手动触摸追踪（用于检测横向滑动切周）
+    private float touchStartX = 0;
+    private float touchStartY = 0;
+    private boolean touchIsHorizontal = false;
+    private static final int SWIPE_MIN_DISTANCE_DP = 60;  // 最小滑动距离（dp）
 
     @Nullable
     @Override
@@ -68,23 +93,60 @@ public class TimetableFragment extends Fragment {
         binding.rvTimetable.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvTimetable.setAdapter(adapter);
         binding.rvTimetable.setNestedScrollingEnabled(false);
+        // 允许子 View 绘制超出自身边界（合并单元格需要）
+        binding.rvTimetable.setClipChildren(false);
+        binding.rvTimetable.setClipToPadding(false);
 
         // 根据屏幕宽度和显示模式动态计算课表单元格尺寸
         applyDynamicCellSizing();
 
-        viewModel.getGridData().observe(getViewLifecycleOwner(), rows -> {
-            adapter.setGridData(rows);
-            // Check if grid is empty
+        viewModel.getGridData().observe(getViewLifecycleOwner(), items -> {
+            adapter.setGridData(items);
+            // 检查是否有课程数据（仅检查节次行，忽略分隔行）
             boolean empty = true;
-            if (rows != null) {
-                for (Course[] row : rows) {
-                    for (int d = 1; d <= 7; d++) {
-                        if (row[d] != null) { empty = false; break; }
+            if (items != null) {
+                for (GridItem item : items) {
+                    if (item.type == GridItem.TYPE_PERIOD && item.courses != null) {
+                        for (int d = 1; d <= 7; d++) {
+                            if (item.courses[d] != null) { empty = false; break; }
+                        }
                     }
                     if (!empty) break;
                 }
             }
             binding.tvEmpty.setVisibility(empty ? View.VISIBLE : View.GONE);
+
+            // 滑动动画第二阶段：新内容从对侧滑入 + 淡入 + 放大还原
+            if (isWeekAnimating && pendingWeekDir != 0) {
+                View timetableArea = binding.timetableContainer;
+                if (timetableArea != null) {
+                    // 移除防卡死超时回调
+                    timetableArea.removeCallbacks(animationTimeoutRunnable);
+
+                    int screenWidth = getResources().getDisplayMetrics().widthPixels;
+                    // 初始位置：从滑动方向的对侧 35% 处开始
+                    timetableArea.setTranslationX(pendingWeekDir > 0 ? screenWidth * 0.35f : -screenWidth * 0.35f);
+                    timetableArea.setAlpha(0f);
+                    timetableArea.setScaleX(0.92f);
+                    timetableArea.setScaleY(0.92f);
+
+                    timetableArea.animate()
+                        .translationX(0f)
+                        .alpha(1f)
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(280)
+                        .setInterpolator(new DecelerateInterpolator(2.0f))
+                        .withEndAction(() -> {
+                            isWeekAnimating = false;
+                            pendingWeekDir = 0;
+                        })
+                        .start();
+                } else {
+                    isWeekAnimating = false;
+                    pendingWeekDir = 0;
+                }
+            }
         });
 
         // 当前周次文字
@@ -104,17 +166,53 @@ public class TimetableFragment extends Fragment {
             }
         });
 
-        // 周次左右切换箭头
-        binding.btnPrevWeek.setOnClickListener(v -> viewModel.prevWeek());
-        binding.btnNextWeek.setOnClickListener(v -> viewModel.nextWeek());
+        // 左右滑动切换周次（手动触摸追踪，避免与 HorizontalScrollView 冲突）
+        int swipeMinPx = (int) TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, SWIPE_MIN_DISTANCE_DP, getResources().getDisplayMetrics());
 
-        // 根据当前周次启用/禁用切换按钮
-        viewModel.getCurrentWeek().observe(getViewLifecycleOwner(), week -> {
-            if (week != null) {
-                binding.btnPrevWeek.setEnabled(week > 1);
-                // nextWeek 的边界由 ViewModel 内部判断，此处默认可点
-                binding.btnNextWeek.setEnabled(true);
+        binding.hsvTimetable.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    touchStartX = event.getRawX();
+                    touchStartY = event.getRawY();
+                    touchIsHorizontal = false;
+                    break;
+
+                case MotionEvent.ACTION_MOVE:
+                    if (!touchIsHorizontal) {
+                        float dx = Math.abs(event.getRawX() - touchStartX);
+                        float dy = Math.abs(event.getRawY() - touchStartY);
+                        // 横向位移明显大于纵向时，标记为横向滑动
+                        if (dx > dy * 2f || (dx > swipeMinPx && dx > dy)) {
+                            touchIsHorizontal = true;
+                        }
+                    }
+                    break;
+
+                case MotionEvent.ACTION_UP:
+                    float endX = event.getRawX();
+                    float endY = event.getRawY();
+                    float totalDx = endX - touchStartX;
+                    float totalDy = Math.abs(endY - touchStartY);
+
+                    // 判断是否为有效的横向滑动切周手势
+                    if (touchIsHorizontal && Math.abs(totalDx) > swipeMinPx
+                        && Math.abs(totalDx) > totalDy) {
+                        if (totalDx < 0) {
+                            animateWeekChange(1);  // 左滑 → 下一周
+                        } else {
+                            animateWeekChange(-1); // 右滑 → 上一周
+                        }
+                        // 消费事件，阻止 HorizontalScrollView 的惯性滚动
+                        return true;
+                    }
+                    break;
+
+                case MotionEvent.ACTION_CANCEL:
+                    touchIsHorizontal = false;
+                    break;
             }
+            return false;
         });
 
         // FAB 添加课程（不预设星期和节次）
@@ -122,6 +220,55 @@ public class TimetableFragment extends Fragment {
             CourseEditDialogFragment dialog = CourseEditDialogFragment.newInstance(null, 0, 0);
             dialog.show(getParentFragmentManager(), "CourseEditDialog");
         });
+    }
+
+    /**
+     * 滑动切换周次的动画（两阶段：滑出旧内容 → 切换数据 → 滑入新内容）
+     * @param direction 1=下一周（左滑）, -1=上一周（右滑）
+     */
+    private void animateWeekChange(int direction) {
+        if (isWeekAnimating) return;
+
+        Integer week = viewModel.getCurrentWeek().getValue();
+        if (week == null) return;
+
+        // 双向边界检查：防止在首/末周触发无效动画导致界面卡死
+        if (direction < 0 && week <= 1) return;                       // 已是第一周，无法再往前
+        if (direction > 0 && week >= viewModel.getTotalWeeks()) return; // 已是最后一周，无法再往后
+
+        isWeekAnimating = true;
+        pendingWeekDir = direction;
+
+        View timetableArea = binding.timetableContainer;
+        if (timetableArea == null) {
+            // 降级：无动画直接切换
+            if (direction > 0) viewModel.nextWeek();
+            else viewModel.prevWeek();
+            isWeekAnimating = false;
+            pendingWeekDir = 0;
+            return;
+        }
+
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+
+        // 防卡死保护：动画 1.5 秒后仍未结束则强制重置
+        timetableArea.removeCallbacks(animationTimeoutRunnable);
+        timetableArea.postDelayed(animationTimeoutRunnable, 1500);
+
+        // 第一阶段：当前内容跟随手指方向滑出 + 淡出 + 轻微缩小（营造"卡片被推走"的层次感）
+        timetableArea.animate()
+            .translationX(direction > 0 ? -screenWidth * 0.35f : screenWidth * 0.35f)
+            .alpha(0f)
+            .scaleX(0.92f)
+            .scaleY(0.92f)
+            .setDuration(180)
+            .setInterpolator(new AccelerateInterpolator(1.2f))
+            .withEndAction(() -> {
+                // 切换周次数据（触发 LiveData → 观察者中执行第二阶段滑入动画）
+                if (direction > 0) viewModel.nextWeek();
+                else viewModel.prevWeek();
+            })
+            .start();
     }
 
     /**
@@ -136,6 +283,12 @@ public class TimetableFragment extends Fragment {
         int minWidthPx = (int) (getResources().getDimension(R.dimen.timetable_cell_min_width));
         int maxWidthPx = (int) (getResources().getDimension(R.dimen.timetable_cell_max_width));
         int labelWidthPx = (int) (getResources().getDimension(R.dimen.timetable_period_label_width));
+
+        // 传递单元格高度和边距给 Adapter，用于合并单元格高度计算
+        int cellHeightPx = (int) (getResources().getDimension(R.dimen.timetable_cell_height));
+        int cellMarginPx = (int) TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 1.5f, getResources().getDisplayMetrics());
+        adapter.setCellHeight(cellHeightPx, cellMarginPx);
 
         // 读取显示模式
         int weekMode = PreferenceUtils.getWeekMode(requireContext());
@@ -197,8 +350,10 @@ public class TimetableFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (binding != null) {
+        if (binding != null && viewModel != null) {
             applyThemeColor();
+            // 从设置页返回后刷新课表（节次数/课程时间等配置可能已变更）
+            viewModel.refreshGrid();
         }
     }
 

@@ -21,7 +21,7 @@ import java.util.List;
 public class TimetableViewModel extends AndroidViewModel {
 
     private final TimetableRepository repository;
-    private final MutableLiveData<List<Course[]>> gridData = new MutableLiveData<>();
+    private final MutableLiveData<List<GridItem>> gridData = new MutableLiveData<>();
     private final MutableLiveData<Integer> currentWeek = new MutableLiveData<>(1);
     private final MutableLiveData<String> weekInfo = new MutableLiveData<>("");
     private final MutableLiveData<String[]> headerDates = new MutableLiveData<>();
@@ -40,13 +40,25 @@ public class TimetableViewModel extends AndroidViewModel {
             AppDatabase.getInstance(application).semesterDao()
         );
 
-        // 初始化空行（根据配置的节次数动态生成）
-        int totalPeriods = PreferenceUtils.getTotalPeriodCount(application);
-        List<Course[]> initialRows = new ArrayList<>();
-        for (int i = 0; i < totalPeriods; i++) {
-            initialRows.add(new Course[8]);
+        // 初始化空行（根据配置的节次数动态生成，含午休/晚修分隔行）
+        int morningCount = PreferenceUtils.getMorningCount(application);
+        int afternoonCount = PreferenceUtils.getAfternoonCount(application);
+        int eveningCount = PreferenceUtils.getEveningCount(application);
+        int totalPeriods = morningCount + afternoonCount + eveningCount;
+
+        List<GridItem> initialItems = new ArrayList<>();
+        for (int p = 1; p <= morningCount; p++) {
+            initialItems.add(GridItem.period(p, new Course[8]));
         }
-        gridData.setValue(initialRows);
+        initialItems.add(GridItem.breakRow("午休"));
+        for (int p = morningCount + 1; p <= morningCount + afternoonCount; p++) {
+            initialItems.add(GridItem.period(p, new Course[8]));
+        }
+        initialItems.add(GridItem.breakRow("晚修"));
+        for (int p = morningCount + afternoonCount + 1; p <= totalPeriods; p++) {
+            initialItems.add(GridItem.period(p, new Course[8]));
+        }
+        gridData.setValue(initialItems);
         weekInfo.setValue("");
 
         coursesObserver = courses -> {
@@ -85,10 +97,25 @@ public class TimetableViewModel extends AndroidViewModel {
         repository.getActiveSemester().observeForever(semesterObserver);
     }
 
-    public LiveData<List<Course[]>> getGridData() { return gridData; }
+    public LiveData<List<GridItem>> getGridData() { return gridData; }
     public LiveData<Integer> getCurrentWeek() { return currentWeek; }
     public LiveData<String> getWeekInfo() { return weekInfo; }
     public LiveData<String[]> getHeaderDates() { return headerDates; }
+
+    /**
+     * 获取当前激活学期的总周数，用于边界检查
+     * @return 总周数，无激活学期时返回 0
+     */
+    public int getTotalWeeks() {
+        return activeSemester != null ? activeSemester.getTotalWeeks() : 0;
+    }
+
+    /**
+     * 从外部强制刷新课表网格（如设置页修改节次数后调用）
+     */
+    public void refreshGrid() {
+        rebuildGrid();
+    }
 
     public void nextWeek() {
         if (activeSemester == null) return;
@@ -128,8 +155,7 @@ public class TimetableViewModel extends AndroidViewModel {
 
         if (activeSemester != null) {
             weekInfo.postValue("第" + week + "周 (共" + activeSemester.getTotalWeeks() + "周)");
-            // 计算周一~周日对应的实际日期
-            String[] dates = new String[8]; // 索引 1-7 对应周一~周日
+            String[] dates = new String[8];
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(activeSemester.getStartDate());
             cal.add(Calendar.WEEK_OF_YEAR, week - 1);
@@ -143,28 +169,57 @@ public class TimetableViewModel extends AndroidViewModel {
             weekInfo.postValue("第" + week + "周");
         }
 
-        int totalPeriods = PreferenceUtils.getTotalPeriodCount(getApplication());
-        List<Course[]> rows = new ArrayList<>();
-        for (int period = 1; period <= totalPeriods; period++) {
-            rows.add(new Course[8]);
+        // 获取上午/下午/晚课节数配置
+        int morningCount = PreferenceUtils.getMorningCount(getApplication());
+        int afternoonCount = PreferenceUtils.getAfternoonCount(getApplication());
+        int eveningCount = PreferenceUtils.getEveningCount(getApplication());
+        int totalPeriods = morningCount + afternoonCount + eveningCount;
+
+        // 按顺序构建 GridItem 列表：上午节次 → 午休 → 下午节次 → 晚修 → 晚课节次
+        List<GridItem> items = new ArrayList<>();
+        java.util.Map<Integer, Integer> periodToIndex = new java.util.HashMap<>();
+
+        // 上午节次：period 1 ~ morningCount
+        for (int p = 1; p <= morningCount; p++) {
+            periodToIndex.put(p, items.size());
+            items.add(GridItem.period(p, new Course[8]));
+        }
+        // 午休分隔行
+        items.add(GridItem.breakRow("午休"));
+
+        // 下午节次：period (morningCount+1) ~ (morningCount+afternoonCount)
+        for (int p = morningCount + 1; p <= morningCount + afternoonCount; p++) {
+            periodToIndex.put(p, items.size());
+            items.add(GridItem.period(p, new Course[8]));
+        }
+        // 晚修分隔行
+        items.add(GridItem.breakRow("晚修"));
+
+        // 晚课节次：period (morningCount+afternoonCount+1) ~ totalPeriods
+        for (int p = morningCount + afternoonCount + 1; p <= totalPeriods; p++) {
+            periodToIndex.put(p, items.size());
+            items.add(GridItem.period(p, new Course[8]));
         }
 
+        // 将课程填入对应的节次行
         for (Course course : allCourses) {
             if (WeekPatternUtils.isActiveInWeek(course.getWeekPattern(), week)) {
                 int day = course.getDayOfWeek();
                 if (day >= 1 && day <= 7) {
-                    int startIdx = course.getStartPeriod() - 1;
-                    int endIdx = startIdx + course.getDuration(); // 结束节次（不含）
-                    for (int idx = startIdx; idx < endIdx && idx < totalPeriods; idx++) {
-                        if (idx >= 0) {
-                            rows.get(idx)[day] = course;
+                    int startPeriod = course.getStartPeriod();
+                    int duration = course.getDuration();
+                    for (int offset = 0; offset < duration; offset++) {
+                        int period = startPeriod + offset;
+                        Integer idx = periodToIndex.get(period);
+                        if (idx != null && idx < items.size()) {
+                            items.get(idx).courses[day] = course;
                         }
                     }
                 }
             }
         }
 
-        gridData.postValue(rows);
+        gridData.postValue(items);
     }
 
     @Override

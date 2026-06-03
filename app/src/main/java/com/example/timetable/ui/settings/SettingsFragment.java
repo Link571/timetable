@@ -7,12 +7,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ScrollView;
 import android.widget.Toast;
+
+import com.google.android.material.slider.Slider;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -236,6 +241,7 @@ public class SettingsFragment extends Fragment {
 
     /**
      * 课程时间设置弹窗：设置上午/下午/晚课节数和每节课起止时间
+     * 使用 Material Slider 调节节数，点击时间按钮唤起 MaterialTimePicker 选择时分
      */
     private void showCourseTimeSettingsDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
@@ -248,23 +254,24 @@ public class SettingsFragment extends Fragment {
             PreferenceUtils.getEveningCount(requireContext())
         };
         String[] currentTimes = PreferenceUtils.getPeriodTimes(requireContext());
-
-        // 可变的 period 时间列表
         final String[][] mutableTimes = {currentTimes.clone()};
-        // 动态编辑框引用列表
-        final java.util.ArrayList<EditText> startEditorList = new java.util.ArrayList<>();
-        final java.util.ArrayList<EditText> endEditorList = new java.util.ArrayList<>();
+
+        // 时间按钮引用列表（按全局节次索引排列）
+        final java.util.ArrayList<TextView> startBtnList = new java.util.ArrayList<>();
+        final java.util.ArrayList<TextView> endBtnList = new java.util.ArrayList<>();
+
+        float density = getResources().getDisplayMetrics().density;
 
         ScrollView scrollView = new ScrollView(requireContext());
         LinearLayout rootLayout = new LinearLayout(requireContext());
         rootLayout.setOrientation(LinearLayout.VERTICAL);
-        rootLayout.setPadding(24, 12, 24, 0);
+        rootLayout.setPadding((int)(28 * density), (int)(20 * density),
+            (int)(28 * density), (int)(24 * density));
 
         String[] sectionTitles = {"上午课程", "下午课程", "晚课"};
         String[] sectionLabels = {"上午", "下午", "晚课"};
 
         LinearLayout[] sectionTimeContainers = new LinearLayout[3];
-        TextView[] countTextViews = new TextView[3];
 
         for (int sec = 0; sec < 3; sec++) {
             final int sectionIndex = sec;
@@ -272,68 +279,78 @@ public class SettingsFragment extends Fragment {
             // 区块标题
             TextView secTitle = new TextView(requireContext());
             secTitle.setText(sectionTitles[sec]);
-            secTitle.setTextSize(16);
-            secTitle.setPadding(0, 12, 0, 4);
+            secTitle.setTextSize(17);
+            secTitle.setTypeface(null, android.graphics.Typeface.BOLD);
+            secTitle.setTextColor(0xFF333333);
+            secTitle.setPadding(0, (int)(12 * density), 0, (int)(8 * density));
             rootLayout.addView(secTitle);
 
-            // 数量调节行
-            LinearLayout stepperRow = new LinearLayout(requireContext());
-            stepperRow.setOrientation(LinearLayout.HORIZONTAL);
-            stepperRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
+            // 节数滑块行：标签 + Slider + 数量显示
+            LinearLayout sliderRow = new LinearLayout(requireContext());
+            sliderRow.setOrientation(LinearLayout.HORIZONTAL);
+            sliderRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
+            sliderRow.setPadding(0, 0, 0, (int)(8 * density));
 
-            com.google.android.material.button.MaterialButton btnMinus = new com.google.android.material.button.MaterialButton(requireContext());
-            btnMinus.setText("−");
-            btnMinus.setTextSize(18);
-            btnMinus.setLayoutParams(new LinearLayout.LayoutParams(80, 80));
+            TextView tvLabel = new TextView(requireContext());
+            tvLabel.setText("节数");
+            tvLabel.setTextSize(14);
+            tvLabel.setTextColor(0xFF888888);
+            sliderRow.addView(tvLabel);
+
+            Slider slider = new Slider(requireContext());
+            slider.setValueFrom(1);
+            slider.setValueTo(10);
+            slider.setStepSize(1);
+            slider.setValue(counts[sec]);
+            LinearLayout.LayoutParams sliderParams = new LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+            sliderParams.setMargins((int)(12 * density), 0, (int)(12 * density), 0);
+            slider.setLayoutParams(sliderParams);
 
             TextView tvCount = new TextView(requireContext());
             tvCount.setText(String.valueOf(counts[sec]));
-            tvCount.setTextSize(18);
+            tvCount.setTextSize(16);
+            tvCount.setTypeface(null, android.graphics.Typeface.BOLD);
+            tvCount.setTextColor(0xFF333333);
             tvCount.setGravity(android.view.Gravity.CENTER);
-            tvCount.setLayoutParams(new LinearLayout.LayoutParams(0,
-                LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-            countTextViews[sec] = tvCount;
-
-            com.google.android.material.button.MaterialButton btnPlus = new com.google.android.material.button.MaterialButton(requireContext());
-            btnPlus.setText("+");
-            btnPlus.setTextSize(18);
-            btnPlus.setLayoutParams(new LinearLayout.LayoutParams(80, 80));
-
-            stepperRow.addView(btnMinus);
-            stepperRow.addView(tvCount);
-            stepperRow.addView(btnPlus);
-            rootLayout.addView(stepperRow);
+            tvCount.setMinWidth((int)(32 * density));
+            sliderRow.addView(slider);
+            sliderRow.addView(tvCount);
+            rootLayout.addView(sliderRow);
 
             // 节次时间编辑容器
             LinearLayout timeContainer = new LinearLayout(requireContext());
             timeContainer.setOrientation(LinearLayout.VERTICAL);
-            timeContainer.setPadding(0, 4, 0, 4);
+            timeContainer.setPadding((int)(4 * density), (int)(4 * density),
+                (int)(4 * density), (int)(4 * density));
             sectionTimeContainers[sec] = timeContainer;
             rootLayout.addView(timeContainer);
 
-            // 分隔线
-            View divider = new View(requireContext());
-            divider.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 2));
-            divider.setBackgroundColor(0x33000000);
-            rootLayout.addView(divider);
+            // 区块间分隔线
+            if (sec < 2) {
+                View divider = new View(requireContext());
+                LinearLayout.LayoutParams divParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, (int)(1 * density));
+                divParams.setMargins(0, (int)(10 * density), 0, (int)(14 * density));
+                divider.setLayoutParams(divParams);
+                divider.setBackgroundColor(0x1E000000);
+                rootLayout.addView(divider);
+            }
 
-            btnMinus.setOnClickListener(v -> {
-                if (counts[sectionIndex] <= 1) return;
-                counts[sectionIndex]--;
-                refreshSectionRows(counts, mutableTimes, sectionTimeContainers, countTextViews,
-                    sectionLabels, startEditorList, endEditorList);
-            });
-            btnPlus.setOnClickListener(v -> {
-                counts[sectionIndex]++;
-                refreshSectionRows(counts, mutableTimes, sectionTimeContainers, countTextViews,
-                    sectionLabels, startEditorList, endEditorList);
+            slider.addOnChangeListener((s, value, fromUser) -> {
+                int newCount = (int) value;
+                tvCount.setText(String.valueOf(newCount));
+                counts[sectionIndex] = newCount;
+                // 重建前：将按钮文本同步回 mutableTimes，保留已选时间
+                syncMutableTimes(mutableTimes, startBtnList, endBtnList);
+                refreshSectionRows(counts, mutableTimes, sectionTimeContainers,
+                    sectionLabels, startBtnList, endBtnList, density);
             });
         }
 
         // 初始渲染
-        refreshSectionRows(counts, mutableTimes, sectionTimeContainers, countTextViews,
-            sectionLabels, startEditorList, endEditorList);
+        refreshSectionRows(counts, mutableTimes, sectionTimeContainers,
+            sectionLabels, startBtnList, endBtnList, density);
 
         scrollView.addView(rootLayout);
         builder.setView(scrollView);
@@ -342,9 +359,10 @@ public class SettingsFragment extends Fragment {
             int total = counts[0] + counts[1] + counts[2];
             String[] newTimes = new String[total];
             for (int i = 0; i < total; i++) {
-                String start = (i < startEditorList.size()) ? startEditorList.get(i).getText().toString().trim() : "";
-                String end = (i < endEditorList.size()) ? endEditorList.get(i).getText().toString().trim() : "";
-                if (start.isEmpty() || end.isEmpty() || !start.matches("\\d{2}:\\d{2}") || !end.matches("\\d{2}:\\d{2}")) {
+                String start = startBtnList.get(i).getText().toString().trim();
+                String end = endBtnList.get(i).getText().toString().trim();
+                // 时间来自滚轮选择器，格式已保证正确，兜底使用默认值
+                if (start.isEmpty() || end.isEmpty()) {
                     newTimes[i] = (i < PreferenceUtils.DEFAULT_PERIOD_TIMES.length)
                         ? PreferenceUtils.DEFAULT_PERIOD_TIMES[i]
                         : String.format("%02d:00-%02d:45", 8 + i, 8 + i);
@@ -362,14 +380,27 @@ public class SettingsFragment extends Fragment {
         builder.show();
     }
 
+    /** 将时间按钮文本同步回 mutableTimes，保证节数变更时已修改的时间不丢失 */
+    private void syncMutableTimes(String[][] mutableTimes,
+                                  java.util.ArrayList<TextView> startBtnList,
+                                  java.util.ArrayList<TextView> endBtnList) {
+        int len = Math.min(mutableTimes[0].length, startBtnList.size());
+        for (int i = 0; i < len; i++) {
+            mutableTimes[0][i] = startBtnList.get(i).getText() + "-"
+                + endBtnList.get(i).getText();
+        }
+    }
+
     /**
      * 当任一区块节数变更时，重建所有区块的节次时间编辑行
+     * 时间录入改为可点击的 TextView 按钮，点击唤起 MaterialTimePicker
      */
     private void refreshSectionRows(int[] counts, String[][] mutableTimes,
-                                     LinearLayout[] containers, TextView[] countTextViews,
+                                     LinearLayout[] containers,
                                      String[] sectionLabels,
-                                     java.util.ArrayList<EditText> startEditorList,
-                                     java.util.ArrayList<EditText> endEditorList) {
+                                     java.util.ArrayList<TextView> startBtnList,
+                                     java.util.ArrayList<TextView> endBtnList,
+                                     float density) {
         int newTotal = counts[0] + counts[1] + counts[2];
         String[] oldTimes = mutableTimes[0];
         String[] newTimes = new String[newTotal];
@@ -384,63 +415,131 @@ public class SettingsFragment extends Fragment {
             }
         }
         mutableTimes[0] = newTimes;
-        startEditorList.clear();
-        endEditorList.clear();
+        startBtnList.clear();
+        endBtnList.clear();
 
         int periodIdx = 0;
         for (int sec = 0; sec < 3; sec++) {
-            countTextViews[sec].setText(String.valueOf(counts[sec]));
             LinearLayout container = containers[sec];
             container.removeAllViews();
 
             for (int local = 0; local < counts[sec]; local++) {
-                int globalIdx = periodIdx + local;
+                final int globalIdx = periodIdx + local;
                 String label = sectionLabels[sec] + "第" + (local + 1) + "节";
                 String timeStr = newTimes[globalIdx];
                 String[] parts = timeStr.split("-");
+                final String startTime = parts.length > 0 ? parts[0] : "08:00";
+                final String endTime = parts.length > 1 ? parts[1] : "08:45";
 
+                // 行布局：标签 + 开始时间 + 分隔符 + 结束时间
                 LinearLayout row = new LinearLayout(requireContext());
                 row.setOrientation(LinearLayout.HORIZONTAL);
                 row.setGravity(android.view.Gravity.CENTER_VERTICAL);
-                row.setPadding(0, 2, 0, 2);
+                row.setPadding(0, (int)(4 * density), 0, (int)(4 * density));
 
+                // 节次标签
                 TextView labelView = new TextView(requireContext());
                 labelView.setText(label);
-                labelView.setTextSize(12);
-                labelView.setLayoutParams(new LinearLayout.LayoutParams(
-                    (int) (75 * getResources().getDisplayMetrics().density),
-                    LinearLayout.LayoutParams.WRAP_CONTENT));
+                labelView.setTextSize(13);
+                labelView.setTextColor(0xFF666666);
+                LinearLayout.LayoutParams labelParams = new LinearLayout.LayoutParams(
+                    (int)(80 * density), LinearLayout.LayoutParams.WRAP_CONTENT);
+                labelView.setLayoutParams(labelParams);
 
-                EditText etStart = new EditText(requireContext());
-                etStart.setText(parts.length > 0 ? parts[0] : "08:00");
-                etStart.setSingleLine(true);
-                etStart.setTextSize(13);
-                etStart.setLayoutParams(new LinearLayout.LayoutParams(0,
-                    LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+                // 开始时间按钮（点击唤起时间选择器）
+                TextView btnStart = createTimeButton(startTime, density);
+                btnStart.setOnClickListener(v -> showTimePicker(btnStart, mutableTimes,
+                    startBtnList, endBtnList));
 
+                // 分隔符
                 TextView sep = new TextView(requireContext());
-                sep.setText("至");
-                sep.setTextSize(13);
-                sep.setPadding(4, 0, 4, 0);
+                sep.setText("—");
+                sep.setTextSize(14);
+                sep.setTextColor(0xFFAAAAAA);
+                sep.setGravity(android.view.Gravity.CENTER);
+                sep.setPadding((int)(4 * density), 0, (int)(4 * density), 0);
 
-                EditText etEnd = new EditText(requireContext());
-                etEnd.setText(parts.length > 1 ? parts[1] : "08:45");
-                etEnd.setSingleLine(true);
-                etEnd.setTextSize(13);
-                etEnd.setLayoutParams(new LinearLayout.LayoutParams(0,
-                    LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+                // 结束时间按钮
+                TextView btnEnd = createTimeButton(endTime, density);
+                btnEnd.setOnClickListener(v -> showTimePicker(btnEnd, mutableTimes,
+                    startBtnList, endBtnList));
 
                 row.addView(labelView);
-                row.addView(etStart);
+                row.addView(btnStart);
                 row.addView(sep);
-                row.addView(etEnd);
+                row.addView(btnEnd);
                 container.addView(row);
 
-                startEditorList.add(etStart);
-                endEditorList.add(etEnd);
+                startBtnList.add(btnStart);
+                endBtnList.add(btnEnd);
             }
             periodIdx += counts[sec];
         }
+    }
+
+    /** 创建时间显示按钮：浅圆角 + 浅灰边框 + 按压高亮反馈 */
+    private TextView createTimeButton(String time, float density) {
+        TextView btn = new TextView(requireContext());
+        btn.setText(time);
+        btn.setTextSize(14);
+        btn.setTextColor(0xFF333333);
+        btn.setGravity(android.view.Gravity.CENTER);
+        btn.setClickable(true);
+        btn.setFocusable(true);
+        int pad = (int)(8 * density);
+        btn.setPadding(pad, pad, pad, pad);
+
+        // 普通态：白底 + 浅灰边框 + 圆角
+        GradientDrawable normalBg = new GradientDrawable();
+        normalBg.setShape(GradientDrawable.RECTANGLE);
+        normalBg.setCornerRadius(8 * density);
+        normalBg.setColor(0xFFFFFFFF);
+        normalBg.setStroke((int)(1 * density), 0xFFDDDDDD);
+
+        // 按压态：浅灰底 + 深边框（高亮反馈）
+        GradientDrawable pressedBg = new GradientDrawable();
+        pressedBg.setShape(GradientDrawable.RECTANGLE);
+        pressedBg.setCornerRadius(8 * density);
+        pressedBg.setColor(0xFFF0F0F0);
+        pressedBg.setStroke((int)(1.5f * density), 0xFFBBBBBB);
+
+        StateListDrawable sld = new StateListDrawable();
+        sld.addState(new int[]{android.R.attr.state_pressed}, pressedBg);
+        sld.addState(new int[]{}, normalBg);
+        btn.setBackground(sld);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+            0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+        btn.setLayoutParams(params);
+        return btn;
+    }
+
+    /** 唤起 MaterialTimePicker（时钟滚轮模式），确认后回填时间到按钮并同步 mutableTimes */
+    private void showTimePicker(TextView targetBtn, String[][] mutableTimes,
+                                java.util.ArrayList<TextView> startBtnList,
+                                java.util.ArrayList<TextView> endBtnList) {
+        String current = targetBtn.getText().toString();
+        int hour = 8, minute = 0;
+        try {
+            String[] hm = current.split(":");
+            hour = Integer.parseInt(hm[0]);
+            minute = Integer.parseInt(hm[1]);
+        } catch (Exception ignored) {}
+
+        MaterialTimePicker picker = new MaterialTimePicker.Builder()
+            .setTimeFormat(TimeFormat.CLOCK_24H)
+            .setHour(hour)
+            .setMinute(minute)
+            .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+            .setTitleText("选择时间")
+            .build();
+        picker.addOnPositiveButtonClickListener(d -> {
+            String newTime = String.format("%02d:%02d", picker.getHour(), picker.getMinute());
+            targetBtn.setText(newTime);
+            // 同步到 mutableTimes，确保节数变更时保留已选时间
+            syncMutableTimes(mutableTimes, startBtnList, endBtnList);
+        });
+        picker.show(getParentFragmentManager(), "time_picker");
     }
 
     private void showAddSemesterDialog() {
