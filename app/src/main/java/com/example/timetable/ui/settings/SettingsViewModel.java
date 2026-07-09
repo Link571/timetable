@@ -2,28 +2,23 @@ package com.example.timetable.ui.settings;
 
 import android.app.Application;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.example.timetable.data.database.AppDatabase;
+import com.example.timetable.data.AppExecutors;
 import com.example.timetable.data.model.Semester;
 import com.example.timetable.repository.TimetableRepository;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class SettingsViewModel extends AndroidViewModel {
 
     private final TimetableRepository repository;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public SettingsViewModel(Application application) {
+    public SettingsViewModel(@NonNull Application application) {
         super(application);
-        repository = new TimetableRepository(
-            AppDatabase.getInstance(application).courseDao(),
-            AppDatabase.getInstance(application).semesterDao()
-        );
+        repository = TimetableRepository.getInstance(application);
     }
 
     public LiveData<Semester> getActiveSemester() { return repository.getActiveSemester(); }
@@ -33,7 +28,7 @@ public class SettingsViewModel extends AndroidViewModel {
     public void setCurrentWeek(int semesterId, int week) { repository.setCurrentWeek(semesterId, week); }
 
     public void addSemester(Semester semester) {
-        executor.execute(() -> {
+        AppExecutors.getInstance().diskIO().execute(() -> {
             long id = repository.insertSemesterSync(semester);
             repository.activateSemester((int) id);
         });
@@ -45,5 +40,13 @@ public class SettingsViewModel extends AndroidViewModel {
 
     public void deleteSemester(int semesterId) {
         repository.deleteSemester(semesterId);
+    }
+
+    public void rescheduleReminders() {
+        repository.rescheduleReminders();
+    }
+
+    public void cancelReminders() {
+        repository.cancelReminders();
     }
 }

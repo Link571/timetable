@@ -14,7 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.timetable.R;
-import com.example.timetable.data.database.AppDatabase;
+import com.example.timetable.data.AppExecutors;
 import com.example.timetable.data.model.Course;
 import com.example.timetable.data.model.Semester;
 import com.example.timetable.databinding.DialogCourseEditBinding;
@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class CourseEditDialogFragment extends BottomSheetDialogFragment {
 
@@ -41,7 +40,7 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
 
     private DialogCourseEditBinding binding;
     private TimetableRepository repository;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor = AppExecutors.getInstance().diskIO();
     private Course existingCourse;
     private int presetDay;
     private int presetPeriod;
@@ -62,10 +61,7 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        repository = new TimetableRepository(
-            AppDatabase.getInstance(requireContext()).courseDao(),
-            AppDatabase.getInstance(requireContext()).semesterDao()
-        );
+        repository = TimetableRepository.getInstance(requireContext());
         if (getArguments() != null) {
             existingCourse = (Course) getArguments().getSerializable(ARG_COURSE);
             presetDay = getArguments().getInt(ARG_DAY, 0);
@@ -106,10 +102,8 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
         binding.btnSave.setOnClickListener(v -> saveCourse());
         binding.btnDelete.setOnClickListener(v -> deleteCourse());
 
-        // Load semester data on background thread
         executor.execute(() -> {
             Semester semester = repository.getActiveSemesterSync();
-            // Auto-assign color for new course (must be on bg thread)
             int autoColor = selectedColor;
             if (existingCourse == null && semester != null) {
                 List<Course> courses = repository.getCoursesBySemesterSync(semester.getId());
@@ -128,7 +122,7 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
                     binding.btnDelete.setVisibility(View.VISIBLE);
                 } else {
                     binding.btnDelete.setVisibility(View.GONE);
-                    binding.chipAll.setChecked(true); // 新建课程默认选中"全部周"
+                    binding.chipAll.setChecked(true);
                     if (presetDay > 0) binding.spinnerDay.setSelection(presetDay - 1);
                     if (presetPeriod > 0) {
                         binding.npStartPeriod.setValue(presetPeriod);
@@ -200,7 +194,6 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
         int dotSize = (int) (30 * density);
         int margin = (int) (5 * density);
 
-        // 默认选中第一个颜色
         selectedColor = (existingCourse != null) ? existingCourse.getColor() : ColorUtils.PREDEFINED_COLORS[0];
 
         for (int color : ColorUtils.PREDEFINED_COLORS) {
@@ -218,7 +211,6 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
 
             dot.setOnClickListener(v -> {
                 selectedColor = color;
-                // 更新选中态
                 for (int i = 0; i < binding.colorPicker.getChildCount(); i++) {
                     View child = binding.colorPicker.getChildAt(i);
                     android.graphics.drawable.GradientDrawable gd =
@@ -233,7 +225,6 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
             binding.colorPicker.addView(dot);
         }
 
-        // 初始选中态
         binding.colorPicker.post(() -> {
             for (int i = 0; i < binding.colorPicker.getChildCount(); i++) {
                 if (ColorUtils.PREDEFINED_COLORS[i] == selectedColor) {
@@ -294,7 +285,6 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
             return;
         }
 
-        // 在后台线程构建课程数据并检测冲突
         executor.execute(() -> {
             Semester semester = repository.getActiveSemesterSync();
             if (semester == null) {
@@ -321,7 +311,6 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
                 finalWeeks = WeekPatternUtils.generatePattern(semester.getTotalWeeks(), selectedPatternType, null);
             }
 
-            // 构建待保存的课程对象（先不入库）
             Course course = existingCourse != null ? existingCourse : new Course();
             course.setName(name);
             course.setTeacher(binding.etTeacher.getText().toString().trim());
@@ -334,7 +323,6 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
             course.setSemesterId(semester.getId());
             course.setNotes(binding.etNotes.getText().toString().trim());
 
-            // 检测时间冲突
             List<Course> allCourses = repository.getCoursesBySemesterSync(semester.getId());
             List<Course> conflicts = findConflicts(course, allCourses);
 
@@ -366,37 +354,25 @@ public class CourseEditDialogFragment extends BottomSheetDialogFragment {
         });
     }
 
-    /**
-     * 检测新课程与已有课程列表的时间冲突
-     * 冲突条件：同一天 + 节次范围重叠 + 周次有交集
-     */
     private List<Course> findConflicts(Course newCourse, List<Course> allCourses) {
         List<Course> result = new ArrayList<>();
         int newDay = newCourse.getDayOfWeek();
         int newStart = newCourse.getStartPeriod();
-        int newEnd = newStart + newCourse.getDuration(); // 不含结束节次
+        int newEnd = newStart + newCourse.getDuration();
         List<Integer> newWeeks = newCourse.getWeekPattern();
 
         for (Course existing : allCourses) {
-            // 编辑模式：跳过自身
             if (existingCourse != null && existing.getId() == existingCourse.getId()) continue;
-            // 必须同一天
             if (existing.getDayOfWeek() != newDay) continue;
-            // 节次范围是否重叠
             int exStart = existing.getStartPeriod();
             int exEnd = exStart + existing.getDuration();
             if (newStart >= exEnd || newEnd <= exStart) continue;
-            // 周次是否有交集
             if (Collections.disjoint(newWeeks, existing.getWeekPattern())) continue;
-
             result.add(existing);
         }
         return result;
     }
 
-    /**
-     * 执行实际的入库操作（在后台线程调用）
-     */
     private void doSaveCourse(Course course) {
         if (existingCourse != null) {
             repository.updateCourse(course);

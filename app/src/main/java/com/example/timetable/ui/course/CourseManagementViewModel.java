@@ -2,11 +2,11 @@ package com.example.timetable.ui.course;
 
 import android.app.Application;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 
-import com.example.timetable.data.database.AppDatabase;
 import com.example.timetable.data.model.Course;
 import com.example.timetable.data.model.Semester;
 import com.example.timetable.repository.TimetableRepository;
@@ -19,12 +19,9 @@ public class CourseManagementViewModel extends AndroidViewModel {
     private final MediatorLiveData<List<Course>> allCourses = new MediatorLiveData<>();
     private LiveData<List<Course>> currentCoursesSource;
 
-    public CourseManagementViewModel(Application application) {
+    public CourseManagementViewModel(@NonNull Application application) {
         super(application);
-        repository = new TimetableRepository(
-            AppDatabase.getInstance(application).courseDao(),
-            AppDatabase.getInstance(application).semesterDao()
-        );
+        repository = TimetableRepository.getInstance(application);
 
         allCourses.addSource(repository.getActiveSemester(), semester -> {
             if (semester != null) {

@@ -7,9 +7,9 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.example.timetable.R;
-import com.example.timetable.data.database.AppDatabase;
 import com.example.timetable.data.model.Course;
 import com.example.timetable.data.model.Semester;
+import com.example.timetable.repository.TimetableRepository;
 import com.example.timetable.util.WeekPatternUtils;
 
 import java.util.ArrayList;
@@ -34,13 +34,13 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
     @Override
     public void onDataSetChanged() {
         todayCourses.clear();
-        AppDatabase db = AppDatabase.getInstance(context);
-        Semester semester = db.semesterDao().getActiveSemesterSync();
+        TimetableRepository repository = TimetableRepository.getInstance(context);
+        Semester semester = repository.getActiveSemesterSync();
         if (semester != null) {
             Calendar cal = Calendar.getInstance();
             int dayOfWeek = (cal.get(Calendar.DAY_OF_WEEK) + 5) % 7 + 1;
             int currentWeek = semester.getCurrentWeek();
-            List<Course> all = db.courseDao().getCoursesBySemesterAndDaySync(semester.getId(), dayOfWeek);
+            List<Course> all = repository.getCoursesBySemesterAndDaySync(semester.getId(), dayOfWeek);
             for (Course c : all) {
                 if (WeekPatternUtils.isActiveInWeek(c.getWeekPattern(), currentWeek)) {
                     todayCourses.add(c);

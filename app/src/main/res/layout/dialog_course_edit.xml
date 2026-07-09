@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg_app"
     android:fillViewport="true">
 
     <LinearLayout
@@ -11,38 +12,25 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- 基本信息区块 -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardElevation="1dp"
-            app:cardCornerRadius="12dp"
-            app:strokeWidth="0dp"
-            android:layout_marginBottom="12dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="12dp">
-
+        <com.google.android.material.card.MaterialCardView style="@style/SettingsCard">
+            <LinearLayout style="@style/SettingsCardContent">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="基本信息"
+                    android:layout_marginBottom="12dp"
+                    android:text="@string/basic_info"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
                     android:textColor="?attr/colorPrimary"
-                    android:layout_marginBottom="10dp" />
+                    android:textStyle="bold" />
 
                 <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="课程名称 *"
-                    app:counterMaxLength="30"
+                    android:hint="@string/course_name_hint"
                     app:counterEnabled="true"
-                    app:placeholderText="例如：高等数学"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
+                    app:counterMaxLength="30"
+                    app:placeholderText="@string/course_name_placeholder">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_name"
                         android:layout_width="match_parent"
@@ -51,13 +39,12 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="教师"
-                    app:placeholderText="任课教师姓名"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_marginTop="8dp">
-
+                    android:layout_marginTop="10dp"
+                    android:hint="@string/teacher_hint"
+                    app:placeholderText="@string/teacher_placeholder">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_teacher"
                         android:layout_width="match_parent"
@@ -65,293 +52,212 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="上课地点 *"
-                    app:placeholderText="例如：教学楼101"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_marginTop="8dp">
-
+                    android:layout_marginTop="10dp"
+                    android:hint="@string/classroom_hint"
+                    app:placeholderText="@string/classroom_placeholder">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_classroom"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
                 </com.google.android.material.textfield.TextInputLayout>
-
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- 时间安排区块 -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardElevation="1dp"
-            app:cardCornerRadius="12dp"
-            app:strokeWidth="0dp"
-            android:layout_marginBottom="12dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="12dp">
-
+        <com.google.android.material.card.MaterialCardView style="@style/SettingsCard">
+            <LinearLayout style="@style/SettingsCardContent">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="时间安排"
+                    android:layout_marginBottom="12dp"
+                    android:text="@string/time_schedule"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
                     android:textColor="?attr/colorPrimary"
-                    android:layout_marginBottom="10dp" />
+                    android:textStyle="bold" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
+                <LinearLayout style="@style/SettingsRow">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="星期"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                        android:layout_marginEnd="12dp" />
-
+                        android:layout_marginEnd="12dp"
+                        android:text="@string/weekday"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
                     <Spinner
                         android:id="@+id/spinner_day"
                         android:layout_width="0dp"
                         android:layout_height="48dp"
                         android:layout_weight="1"
-                        android:background="@drawable/abc_edit_text_material" />
-
+                        android:background="@drawable/bg_period_label"
+                        android:paddingHorizontal="12dp" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="10dp">
-
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal">
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center_horizontal">
-
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="开始节次"
+                            android:layout_marginBottom="4dp"
+                            android:text="@string/start_period"
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                            android:textColor="?android:attr/textColorSecondary"
-                            android:layout_marginBottom="4dp" />
-
+                            android:textColor="@color/text_secondary" />
                         <NumberPicker
                             android:id="@+id/np_start_period"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
-
                     </LinearLayout>
-
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center_horizontal">
-
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="持续节数"
+                            android:layout_marginBottom="4dp"
+                            android:text="@string/duration_periods"
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                            android:textColor="?android:attr/textColorSecondary"
-                            android:layout_marginBottom="4dp" />
-
+                            android:textColor="@color/text_secondary" />
                         <NumberPicker
                             android:id="@+id/np_duration"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
-
                     </LinearLayout>
-
                 </LinearLayout>
-
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- 周次安排区块 -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardElevation="1dp"
-            app:cardCornerRadius="12dp"
-            app:strokeWidth="0dp"
-            android:layout_marginBottom="12dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="12dp">
-
+        <com.google.android.material.card.MaterialCardView style="@style/SettingsCard">
+            <LinearLayout style="@style/SettingsCardContent">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="周次安排"
+                    android:layout_marginBottom="10dp"
+                    android:text="@string/week_schedule"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
                     android:textColor="?attr/colorPrimary"
-                    android:layout_marginBottom="10dp" />
-
+                    android:textStyle="bold" />
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/chip_group_week"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:singleSelection="true"
+                    app:chipSpacing="6dp"
                     app:selectionRequired="true"
-                    app:chipSpacing="6dp">
-
+                    app:singleSelection="true">
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_all"
                         style="@style/Widget.MaterialComponents.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="全周" />
-
+                        android:text="@string/all_weeks" />
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_odd"
                         style="@style/Widget.MaterialComponents.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="单周" />
-
+                        android:text="@string/odd_weeks" />
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_even"
                         style="@style/Widget.MaterialComponents.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="双周" />
-
+                        android:text="@string/even_weeks" />
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_custom"
                         style="@style/Widget.MaterialComponents.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="自定义" />
-
+                        android:text="@string/custom_weeks" />
                 </com.google.android.material.chip.ChipGroup>
-
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/custom_week_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    app:chipSpacing="6dp"
-                    android:visibility="gone" />
-
+                    android:visibility="gone"
+                    app:chipSpacing="6dp" />
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- 个性化区块 -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardElevation="1dp"
-            app:cardCornerRadius="12dp"
-            app:strokeWidth="0dp"
-            android:layout_marginBottom="12dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="12dp">
-
+        <com.google.android.material.card.MaterialCardView style="@style/SettingsCard">
+            <LinearLayout style="@style/SettingsCardContent">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="个性化"
+                    android:layout_marginBottom="10dp"
+                    android:text="@string/personalization"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
                     android:textColor="?attr/colorPrimary"
-                    android:layout_marginBottom="10dp" />
-
+                    android:textStyle="bold" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="课程颜色"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                    android:layout_marginBottom="6dp" />
-
+                    android:layout_marginBottom="6dp"
+                    android:text="@string/course_color"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2" />
                 <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:scrollbars="none">
-
                     <LinearLayout
                         android:id="@+id/color_picker"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:orientation="horizontal"
                         android:paddingVertical="2dp" />
-
                 </HorizontalScrollView>
-
                 <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="备注（可选）"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_marginTop="10dp">
-
+                    android:layout_marginTop="12dp"
+                    android:hint="@string/notes_hint">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_notes"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:maxLines="3" />
                 </com.google.android.material.textfield.TextInputLayout>
-
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- 操作按钮 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="8dp">
-
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_save"
+                style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/dialog_button_height"
+                android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                android:text="保存课程"
-                android:textSize="16sp"
-                app:cornerRadius="12dp"
-                style="@style/Widget.MaterialComponents.Button"
-                android:layout_marginEnd="8dp" />
-
+                android:text="@string/save_course"
+                android:textSize="16sp" />
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_delete"
+                style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/dialog_button_height"
                 android:layout_weight="1"
-                android:text="删除课程"
+                android:text="@string/delete_course"
                 android:textColor="@color/white"
-                app:backgroundTint="@android:color/holo_red_dark"
-                app:cornerRadius="12dp"
-                style="@style/Widget.MaterialComponents.Button"
-                android:visibility="gone" />
-
+                android:visibility="gone"
+                app:backgroundTint="@color/error_red" />
         </LinearLayout>
-
     </LinearLayout>
-
 </ScrollView>

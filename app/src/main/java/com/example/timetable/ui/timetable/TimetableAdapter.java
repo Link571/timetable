@@ -125,27 +125,18 @@ public class TimetableAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 TextView nameView = nameViews[day];
                 TextView roomView = roomViews[day];
 
-                // 重置单元格为默认状态
+                // 重置为默认状态
                 card.setTranslationZ(0f);
-                card.setCardBackgroundColor(0xFFF5F5F5);
+                card.setCardElevation(0f);
+                card.setStrokeColor(0xFFE2E8F0);
+                card.setStrokeWidth((int) itemView.getResources().getDisplayMetrics().density);
+                card.setCardBackgroundColor(0xFFFFFFFF);
                 nameView.setVisibility(View.GONE);
                 roomView.setVisibility(View.GONE);
                 card.setClickable(true);
-                // 恢复默认高度和边距
-                if (cellHeightPx > 0) {
-                    ViewGroup.LayoutParams lp = card.getLayoutParams();
-                    lp.height = cellHeightPx;
-                    if (lp instanceof ViewGroup.MarginLayoutParams) {
-                        ((ViewGroup.MarginLayoutParams) lp).bottomMargin = cellMarginPx;
-                    }
-                    card.setLayoutParams(lp);
-                }
-                // 动态设置单元格宽度
-                if (cellWidthPx > 0) {
-                    ViewGroup.LayoutParams lp = card.getLayoutParams();
-                    lp.width = cellWidthPx;
-                    card.setLayoutParams(lp);
-                }
+
+                // 恢复默认尺寸
+                applyCellSize(card, cellHeightPx, cellMarginPx, cellWidthPx);
 
                 // 根据显示模式控制周六/周日列可见性
                 if (day == 6 || day == 7) {
@@ -157,28 +148,21 @@ public class TimetableAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 card.setVisibility(View.VISIBLE);
 
                 if (course != null) {
-                    int spanRows = course.getDuration();
                     boolean isFirstRow = (course.getStartPeriod() == period);
 
                     if (isFirstRow) {
-                        // 合并单元格的首行：正常渲染课程信息
+                        // 合并单元格的首行：正常渲染课程信息 + 扩展高度覆盖下方行
+                        card.setCardElevation(3f * itemView.getResources().getDisplayMetrics().density);
+                        card.setStrokeColor(0x26FFFFFF);
                         card.setCardBackgroundColor(course.getColor());
                         nameView.setText(course.getName());
                         nameView.setVisibility(View.VISIBLE);
                         roomView.setText(course.getClassroom());
                         roomView.setVisibility(View.VISIBLE);
 
-                        // 跨多行时，扩展卡片高度覆盖下方被合并的单元格
+                        int spanRows = course.getDuration();
                         if (spanRows > 1 && cellHeightPx > 0) {
-                            ViewGroup.LayoutParams lp = card.getLayoutParams();
-                            lp.height = cellHeightPx * spanRows + 2 * cellMarginPx * (spanRows - 1);
-                            // 用负底部边距抵消额外高度，防止当前行被撑高导致后续行下移
-                            if (lp instanceof ViewGroup.MarginLayoutParams) {
-                                int extraHeight = (spanRows - 1) * (cellHeightPx + 2 * cellMarginPx);
-                                ((ViewGroup.MarginLayoutParams) lp).bottomMargin = cellMarginPx - extraHeight;
-                            }
-                            card.setLayoutParams(lp);
-                            card.setTranslationZ(10f);
+                            expandCardForSpan(card, spanRows);
                         }
 
                         final Course c = course;
@@ -186,7 +170,7 @@ public class TimetableAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         final int p = period;
                         card.setOnClickListener(v -> listener.onCellClick(d, p, c));
                     } else {
-                        // 被合并的单元格：隐藏，由上方首行卡片覆盖
+                        // 被合并的单元格：隐藏，由上方首行卡片通过 clipChildren=false 覆盖显示
                         card.setVisibility(View.INVISIBLE);
                         card.setClickable(false);
                     }
@@ -197,6 +181,44 @@ public class TimetableAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     card.setOnClickListener(v -> listener.onCellClick(d, p, null));
                 }
             }
+        }
+
+        /**
+         * 扩展卡片高度以覆盖下方的 spanRows-1 行（合并单元格效果）
+         * 使用 clipChildren=false（已在 RecyclerView 设置）允许卡片绘制超出自身行边界
+         * 负 margin 用于抵消额外高度，避免当前行被撑高
+         */
+        private void expandCardForSpan(MaterialCardView card, int spanRows) {
+            // 单格高度 + 双倍 margin（上下各一个）
+            int singleUnit = cellHeightPx + 2 * cellMarginPx;
+            // 总高度 = spanRows 个单元格 + 减去第一个的上margin(已包含在初始layout中)
+            // 实际计算：总跨度高度 = spanRows * cellHeightPx + (spanRows-1)*2*cellMarginPx
+            int totalSpanHeight = cellHeightPx * spanRows + 2 * cellMarginPx * (spanRows - 1);
+            // 需要抵消的额外高度 = (spanRows-1)个完整单元（因为第一个单元的高度已经在默认layout中）
+            int extraHeight = (spanRows - 1) * singleUnit;
+
+            ViewGroup.LayoutParams lp = card.getLayoutParams();
+            lp.height = totalSpanHeight;
+            if (lp instanceof ViewGroup.MarginLayoutParams) {
+                ((ViewGroup.MarginLayoutParams) lp).bottomMargin = cellMarginPx - extraHeight;
+            }
+            card.setLayoutParams(lp);
+            card.setTranslationZ(10f);
+        }
+
+        /** 设置单元格的默认高度、边距和宽度 */
+        private void applyCellSize(MaterialCardView card, int height, int margin, int width) {
+            ViewGroup.LayoutParams lp = card.getLayoutParams();
+            if (height > 0) {
+                lp.height = height;
+                if (lp instanceof ViewGroup.MarginLayoutParams) {
+                    ((ViewGroup.MarginLayoutParams) lp).bottomMargin = margin;
+                }
+            }
+            if (width > 0) {
+                lp.width = width;
+            }
+            card.setLayoutParams(lp);
         }
     }
 
@@ -215,7 +237,6 @@ public class TimetableAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         void bind(GridItem item) {
             tvLabel.setText(item.label);
 
-            // 设置分隔行宽度与课表总宽度一致，使标签和装饰线居中横跨整行
             if (cellWidthPx > 0 && cellHeightPx > 0) {
                 int labelWidthPx = (int) itemView.getResources()
                     .getDimension(R.dimen.timetable_period_label_width);

@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 主色：专业蓝 -->
-    <color name="blue_primary">#FF1565C0</color>
-    <color name="blue_primary_dark">#FF0D47A1</color>
-    <color name="blue_primary_light">#FF5E92F3</color>
-    <!-- 强调色：青蓝 -->
-    <color name="accent">#FF00897B</color>
-    <color name="accent_light">#FF4DB6AC</color>
-    <!-- 基础色 -->
+    <color name="blue_primary">#2563EB</color>
+    <color name="blue_primary_dark">#1D4ED8</color>
+    <color name="blue_primary_light">#DBEAFE</color>
+    <color name="accent">#0F766E</color>
+    <color name="accent_light">#CCFBF1</color>
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <!-- 功能色 -->
-    <color name="error_red">#FFE53935</color>
-    <color name="success_green">#FF43A047</color>
-    <color name="warning_orange">#FFFB8C00</color>
-    <!-- 背景色 -->
-    <color name="background_light">#FFF5F5F5</color>
+    <color name="error_red">#DC2626</color>
+    <color name="success_green">#16A34A</color>
+    <color name="warning_orange">#F59E0B</color>
+
+    <color name="background_light">#F6F8FC</color>
     <color name="surface_light">#FFFFFFFF</color>
-    <!-- 保留旧名称兼容 -->
+    <color name="surface_tint">#F8FAFF</color>
+    <color name="outline_light">#E2E8F0</color>
+    <color name="text_primary">#111827</color>
+    <color name="text_secondary">#64748B</color>
+
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">课程表</string>
     <string name="app_version">课程表 v%s</string>
@@ -10,11 +11,81 @@
     <string name="empty_timetable">本周暂无课程</string>
     <string name="delete_semester">删除当前学期</string>
     <string name="week_mode_title">课表显示模式</string>
-    <string name="week_mode_weekend">周末显示课程（周一至周日）</string>
+    <string name="week_mode_weekend">显示周末课程（周一至周日）</string>
     <string name="week_mode_hint">关闭后课表仅显示周一至周五</string>
     <string name="confirm_delete_semester">确认删除该学期及其所有课程？\n此操作不可撤销。</string>
     <string name="week_display">第%d周</string>
     <string name="minutes_display">%d 分钟</string>
     <string name="course_conflict_title">课程时间冲突</string>
     <string name="course_conflict_message">"%1$s" 与以下课程时间冲突：\n\n%2$s\n%3$s 第%4$d-%5$d节\n\n是否仍然保存？</string>
+
+    <string name="semester_management">学期管理</string>
+    <string name="add_semester">添加新学期</string>
+    <string name="edit_semester">编辑学期</string>
+    <string name="semester_name_hint">例如：2025-2026 第一学期</string>
+    <string name="total_weeks_hint">总教学周数（默认 16）</string>
+    <string name="no_semester_to_delete">没有可删除的学期</string>
+    <string name="no_semester_to_edit">没有可编辑的学期</string>
+    <string name="semester_name_required">请输入学期名称</string>
+    <string name="semester_added">已添加 %s</string>
+    <string name="semester_updated">已更新 %s</string>
+    <string name="semester_deleted">已删除 %s</string>
+    <string name="select_start_date">选择起始日期</string>
+    <string name="start_date_prefix">起始：%s</string>
+
+    <string name="current_week_title">当前周次</string>
+    <string name="auto_week_hint">根据日期自动计算：第%d周</string>
+    <string name="manual_adjust">手动调整</string>
+
+    <string name="reminder_title">上课提醒</string>
+    <string name="reminder_enable">开启提醒</string>
+    <string name="reminder_advance">提前</string>
+    <string name="exact_alarm_permission_hint">未授予精确闹钟权限，提醒时间可能不够准确</string>
+
+    <string name="course_time_title">课程时间设置</string>
+    <string name="course_time_desc">设置每日上午、下午、晚课节数，以及每节课的起止时间</string>
+    <string name="course_time_button">设置课程时间</string>
+    <string name="course_time_saved">课程时间已保存，请刷新课表查看</string>
+    <string name="section_morning">上午课程</string>
+    <string name="section_afternoon">下午课程</string>
+    <string name="section_evening">晚课</string>
+    <string name="period_count_label">节数</string>
+    <string name="time_picker_title">选择时间</string>
+
+    <string name="theme_color_title">主题颜色</string>
+    <string name="theme_color_desc">选择主题色，立即生效</string>
+    <string name="theme_color_saved">主题色已保存</string>
+    <string name="week_mode_saved">显示模式已保存，切换到课表页即可查看</string>
+
+    <string name="about_title">关于</string>
+    <string name="about_desc">基于 Android Room + Navigation Component</string>
+
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="confirm_delete">确定删除</string>
+    <string name="basic_info">基本信息</string>
+    <string name="course_name_hint">课程名称 *</string>
+    <string name="course_name_placeholder">例如：高等数学</string>
+    <string name="teacher_hint">教师</string>
+    <string name="teacher_placeholder">任课教师姓名</string>
+    <string name="classroom_hint">上课地点 *</string>
+    <string name="classroom_placeholder">例如：教学楼 101</string>
+    <string name="time_schedule">时间安排</string>
+    <string name="weekday">星期</string>
+    <string name="start_period">开始节次</string>
+    <string name="duration_periods">持续节数</string>
+    <string name="week_schedule">周次安排</string>
+    <string name="all_weeks">全周</string>
+    <string name="odd_weeks">单周</string>
+    <string name="even_weeks">双周</string>
+    <string name="custom_weeks">自定义</string>
+    <string name="personalization">个性化</string>
+    <string name="course_color">课程颜色</string>
+    <string name="notes_hint">备注（可选）</string>
+    <string name="save_course">保存课程</string>
+    <string name="delete_course">删除课程</string>
+    <string name="slot_empty">该时段暂无课程</string>
+    <string name="slot_add_course">在此时段添加课程</string>
+    <string name="splash_subtitle">清晰安排每一节课</string>
+    <string name="widget_name">课程表小部件</string>
 </resources>

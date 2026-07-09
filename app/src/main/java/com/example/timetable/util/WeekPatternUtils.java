@@ -5,7 +5,6 @@ import android.content.Context;
 import com.example.timetable.data.model.Semester;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class WeekPatternUtils {
@@ -117,12 +116,7 @@ public class WeekPatternUtils {
     // Returns formatted string like "6月2日 周一"
     public static String getDateForDay(Semester semester, int week, int dayOfWeek) {
         if (semester == null || week < 1 || dayOfWeek < 1 || dayOfWeek > 7) return getDayName(dayOfWeek);
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(semester.getStartDate());
-        cal.add(Calendar.WEEK_OF_YEAR, week - 1);
-        cal.add(Calendar.DAY_OF_MONTH, dayOfWeek - 1);
-        int month = cal.get(Calendar.MONTH) + 1;
-        int day = cal.get(Calendar.DAY_OF_MONTH);
-        return month + "月" + day + "日 " + getDayName(dayOfWeek);
+        // 使用 DateUtils 的精确毫秒偏移算法，避免 Calendar.WEEK_OF_YEAR 跨年边界问题
+        return DateUtils.formatDateFull(semester.getStartDate(), week, dayOfWeek);
     }
 }

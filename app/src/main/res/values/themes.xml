@@ -1,19 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- 应用主题：现代蓝色系，无 ActionBar -->
     <style name="Theme.Timetable" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- 主色 -->
         <item name="colorPrimary">@color/blue_primary</item>
         <item name="colorPrimaryVariant">@color/blue_primary_dark</item>
         <item name="colorOnPrimary">@color/white</item>
-        <!-- 强调色 -->
         <item name="colorSecondary">@color/accent</item>
-        <item name="colorSecondaryVariant">@color/blue_primary_dark</item>
+        <item name="colorSecondaryVariant">@color/accent</item>
         <item name="colorOnSecondary">@color/white</item>
-        <!-- 状态栏 -->
+        <item name="android:colorBackground">@color/background_light</item>
+        <item name="colorSurface">@color/surface_light</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="materialButtonStyle">@style/Widget.Timetable.Button</item>
+        <item name="materialCardViewStyle">@style/Widget.Timetable.Card</item>
+        <item name="bottomNavigationStyle">@style/Widget.Timetable.BottomNavigation</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- 导航栏 -->
-        <item name="android:navigationBarColor">?attr/colorPrimaryVariant</item>
-        <!-- 系统栏浅色图标（白底深色图标） -->
+        <item name="android:navigationBarColor">@color/surface_light</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+
+    <style name="Theme.Timetable.Splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/blue_primary</item>
+        <item name="colorPrimaryVariant">@color/blue_primary_dark</item>
+        <item name="android:windowBackground">@drawable/bg_splash_gradient</item>
+        <item name="android:statusBarColor">@color/blue_primary</item>
+        <item name="android:navigationBarColor">@color/background_light</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+    </style>
+
+    <style name="Widget.Timetable.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">14dp</item>
+        <item name="cardElevation">1dp</item>
+        <item name="strokeColor">@color/outline_light</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="Widget.Timetable.Button" parent="Widget.MaterialComponents.Button">
+        <item name="cornerRadius">10dp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.Timetable.BottomNavigation" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemIconTint">@color/blue_primary</item>
+        <item name="itemTextColor">@color/blue_primary</item>
+        <item name="itemRippleColor">@color/blue_primary_light</item>
+    </style>
+
+    <style name="TimetableHeaderCell">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">3dp</item>
+    </style>
+
+    <style name="TimetableHeaderDay">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/timetable_header_text_size</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TimetableHeaderDate">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">#DDEBFF</item>
+        <item name="android:textSize">@dimen/timetable_header_date_text_size</item>
+    </style>
+
+    <style name="SettingsSectionTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">4dp</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Subtitle2</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SettingsCard">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">18dp</item>
+        <item name="cardBackgroundColor">@color/surface_light</item>
+        <item name="cardCornerRadius">14dp</item>
+        <item name="cardElevation">1dp</item>
+        <item name="strokeColor">@color/outline_light</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="SettingsCardContent">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">16dp</item>
+    </style>
+
+    <style name="SettingsRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
+    <style name="SettingsRowLabel">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body1</item>
     </style>
 </resources>
